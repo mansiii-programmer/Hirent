@@ -5,6 +5,7 @@ import 'package:hirent2/screens/sign_in_screen.dart';
 import 'package:hirent2/screens/signup_screen.dart';
 import 'package:hirent2/screens/profile_screen.dart';
 import 'package:hirent2/screens/your_tasks.dart' as tasks;
+import 'package:hirent2/screens/splash_screen.dart';
 
 void main() {
   runApp(const HirentApp());
@@ -26,33 +27,6 @@ class HirentApp extends StatelessWidget {
         '/profile': (context) => const ProfileSettingsPage(),
         '/yourtasks': (context) => const tasks.YourTasksPage(),
       },
-    );
-  }
-}
-
-class SplashScreen extends StatefulWidget {
-  const SplashScreen({super.key});
-  @override
-  SplashScreenState createState() => SplashScreenState();
-}
-
-class SplashScreenState extends State<SplashScreen> {
-  @override
-  void initState() {
-    super.initState();
-    Future.delayed(const Duration(seconds: 3), () {
-      if (!mounted) return;
-      Navigator.pushReplacementNamed(context, '/signin');
-    });
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: Center(
-        child: Image.asset('assets/images/hirentlogo.jpg'),
-      ),
     );
   }
 }

@@ -27,7 +27,7 @@ class SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  bool _obscurePassword = true; // Fixed missing variable
+  bool _obscurePassword = true;
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -60,167 +60,121 @@ class SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: double.infinity,
-        height: double.infinity,
-        decoration: const BoxDecoration(
-          gradient: LinearGradient(
-            begin: Alignment.topCenter,
-            end: Alignment.bottomCenter,
-            colors: [
-              Colors.black,
-              Colors.black,
-              Color(0xff7B6190), // exact purple color
-            ],
-            stops: [0.0, 0.7, 1.0],
-          ),
-        ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 24.0),
-          child: Form(
-            key: _formKey,
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                const Center(
-                  child: Text(
-                    'HI, WELCOME BACK!',
-                    style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white),
+      backgroundColor: Colors.white, // white background
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: Text(
+                  'HI, WELCOME BACK!',
+                  style: TextStyle(
+                    fontSize: 22,
+                    fontWeight: FontWeight.bold,
+                    color: Color(0xFF9768CF), // purple text
                   ),
                 ),
-                const SizedBox(height: 30),
+              ),
+              const SizedBox(height: 30),
 
-                // Email label
-                const Text(
-                  'Email',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
-                ),
-                const SizedBox(height: 5),
+              // Email label
+              const Text(
+                'Email',
+                style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB)),
+              ),
+              const SizedBox(height: 5),
 
-                // Email input field
-                TextFormField(
-                  controller: _emailController,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor:
-                        const Color(0xffA078C1), // light purple background
-                    hintText: 'Enter your email',
-                    hintStyle: const TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
+              // Email input field
+              TextFormField(
+                controller: _emailController,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[300], // light grey background
+                  hintText: 'Enter your email',
+                  hintStyle: const TextStyle(color: Colors.black54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
                   ),
-                  validator: _validateEmail,
                 ),
-                const SizedBox(height: 20),
+                validator: _validateEmail,
+              ),
+              const SizedBox(height: 20),
 
-                // Password label
-                const Text(
-                  'Password',
-                  style: TextStyle(fontSize: 14, color: Colors.white),
-                ),
-                const SizedBox(height: 5),
+              // Password label
+              const Text(
+                'Password',
+                style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB)),
+              ),
+              const SizedBox(height: 5),
 
-                // Password input field
-                TextFormField(
-                  controller: _passwordController,
-                  obscureText: _obscurePassword,
-                  style: const TextStyle(color: Colors.white),
-                  decoration: InputDecoration(
-                    filled: true,
-                    fillColor:
-                        const Color(0xffA078C1), // light purple background
-                    hintText: 'Enter your password',
-                    hintStyle: const TextStyle(color: Colors.white70),
-                    border: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(10),
-                      borderSide: BorderSide.none,
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: Colors.white,
-                      ),
-                      onPressed: () {
-                        setState(() {
-                          _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
+              // Password input field
+              TextFormField(
+                controller: _passwordController,
+                obscureText: _obscurePassword,
+                decoration: InputDecoration(
+                  filled: true,
+                  fillColor: Colors.grey[300], // light grey background
+                  hintText: 'Enter your password',
+                  hintStyle: const TextStyle(color: Colors.black54),
+                  border: OutlineInputBorder(
+                    borderRadius: BorderRadius.circular(10),
+                    borderSide: BorderSide.none,
                   ),
-                  validator: _validatePassword,
-                ),
-                const SizedBox(height: 10),
-
-                // Forgot password text
-                Align(
-                  alignment: Alignment.centerRight,
-                  child: TextButton(
+                  suffixIcon: IconButton(
+                    icon: Icon(
+                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      color: Colors.black54,
+                    ),
                     onPressed: () {
-                      // Forgot password logic
+                      setState(() {
+                        _obscurePassword = !_obscurePassword;
+                      });
                     },
-                    child: const Text(
-                      'Forgot Password?',
-                      style: TextStyle(color: Colors.white70, fontSize: 14),
-                    ),
                   ),
                 ),
-                const SizedBox(height: 20),
+                validator: _validatePassword,
+              ),
+              const SizedBox(height: 10),
 
-                // Login button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color(0xff8345B6), // purple button
-                      padding: const EdgeInsets.symmetric(vertical: 14),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                    ),
-                    onPressed: _validateForm, // Button to validate form
-                    child: const Text(
-                      'Login',
-                      style: TextStyle(fontSize: 16, color: Colors.white),
-                    ),
+              // Forgot password text
+              Align(
+                alignment: Alignment.centerRight,
+                child: TextButton(
+                  onPressed: () {
+                    // Forgot password logic
+                  },
+                  child: const Text(
+                    'Forgot Password?',
+                    style: TextStyle(color: Color(0xFFB78BDB), fontSize: 14),
                   ),
                 ),
+              ),
+              const SizedBox(height: 20),
 
-                const SizedBox(height: 20), // Added space below login button
-
-                // Move "Don't have an account?" below login button
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    const Text(
-                      "Don't have an account?",
-                      style: TextStyle(color: Colors.white),
+              // Login button
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Color(0xFFB78BDB), // purple button
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
                     ),
-                    GestureDetector(
-                      onTap: () {
-                        if (!mounted) return;
-                        Navigator.pushNamed(context, '/signup');
-                      },
-                      child: const Text(
-                        " Sign Up",
-                        style: TextStyle(
-                          color: Colors.white,
-                          fontWeight: FontWeight.bold,
-                        ),
-                      ),
-                    ),
-                  ],
+                  ),
+                  onPressed: _validateForm, // Button to validate form
+                  child: const Text(
+                    'Login',
+                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  ),
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ),
