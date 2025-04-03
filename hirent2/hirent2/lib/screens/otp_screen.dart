@@ -46,7 +46,8 @@ class OTPVerificationPage extends StatelessWidget {
                   width: 200,
                   child: ElevatedButton(
                     onPressed: () {
-                      // Add OTP verification logic
+                      Navigator.pushNamed(
+                          context, '/homescreen'); // Add OTP verification logic
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color(0xff7B6190),

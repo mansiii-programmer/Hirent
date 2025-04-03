@@ -3,7 +3,6 @@ import 'package:hirent2/screens/chatting_screen.dart';
 import 'package:hirent2/screens/post_task_screen.dart';
 import 'package:hirent2/screens/profile_screen.dart';
 
-
 class HomeScreen extends StatelessWidget {
   const HomeScreen({super.key});
 
@@ -19,7 +18,10 @@ class HomeScreen extends StatelessWidget {
           children: [
             Text(
               'Home',
-              style: TextStyle(color: Colors.black, fontSize: 18, fontWeight: FontWeight.bold),
+              style: TextStyle(
+                  color: Colors.black,
+                  fontSize: 18,
+                  fontWeight: FontWeight.bold),
             ),
             Text(
               '51-B Alankar Palace',
@@ -36,22 +38,31 @@ class HomeScreen extends StatelessWidget {
           const Center(
             child: Text(
               'HIRENT!',
-              style: TextStyle(fontSize: 28, fontWeight: FontWeight.bold, color: Color.fromARGB(255, 119, 57, 169)),
+              style: TextStyle(
+                  fontSize: 28,
+                  fontWeight: FontWeight.bold,
+                  color: Color.fromARGB(255, 119, 57, 169)),
             ),
           ),
           const SizedBox(height: 4),
           const Center(
             child: Text(
               'Where Tasks Meet The Perfect Match',
-              style: TextStyle(fontSize: 14, color: Color.fromARGB(255, 119, 57, 169), fontStyle: FontStyle.italic),
+              style: TextStyle(
+                  fontSize: 14,
+                  color: Color.fromARGB(255, 119, 57, 169),
+                  fontStyle: FontStyle.italic),
             ),
           ),
           const SizedBox(height: 20),
 
           // buttons for different pages
-          _buildTaskCard(context, Icons.edit, 'Your Task', 'Post and monitor your task.', PostTaskPage()),
-          _buildTaskCard(context, Icons.chat, 'Chat', 'Communicate and negotiate prices.', const ChatScreen()),
-          _buildTaskCard(context, Icons.person, 'Profile', 'Manage and view your profile.', ManageProfilePage()),
+          _buildTaskCard(context, Icons.edit, 'Your Task',
+              'Post and monitor your task.', PostTaskPage()),
+          _buildTaskCard(context, Icons.chat, 'Chat',
+              'Communicate and negotiate prices.', const ChatScreen()),
+          _buildTaskCard(context, Icons.person, 'Profile',
+              'Manage and view your profile.', ProfileSettingsPage()),
         ],
       ),
 
@@ -84,12 +95,14 @@ class HomeScreen extends StatelessWidget {
   }
 
   // button with navigation
-  Widget _buildTaskCard(BuildContext context, IconData icon, String title, String description, Widget page) {
+  Widget _buildTaskCard(BuildContext context, IconData icon, String title,
+      String description, Widget page) {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
       child: GestureDetector(
         onTap: () {
-          Navigator.push(context, MaterialPageRoute(builder: (context) => page));
+          Navigator.push(
+              context, MaterialPageRoute(builder: (context) => page));
         },
         child: Container(
           width: double.infinity,
@@ -102,9 +115,14 @@ class HomeScreen extends StatelessWidget {
             children: [
               Icon(icon, size: 40, color: Colors.black54),
               const SizedBox(height: 5),
-              Text(title, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold, color:Color.fromARGB(255, 119, 57, 169))),
+              Text(title,
+                  style: const TextStyle(
+                      fontSize: 16,
+                      fontWeight: FontWeight.bold,
+                      color: Color.fromARGB(255, 119, 57, 169))),
               const SizedBox(height: 3),
-              Text(description, style: const TextStyle(fontSize: 13, color: Colors.black54)),
+              Text(description,
+                  style: const TextStyle(fontSize: 13, color: Colors.black54)),
             ],
           ),
         ),
@@ -112,4 +130,3 @@ class HomeScreen extends StatelessWidget {
     );
   }
 }
-

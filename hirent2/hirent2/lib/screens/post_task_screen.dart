@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class PostTaskPage extends StatelessWidget {
+  const PostTaskPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -14,7 +16,10 @@ class PostTaskPage extends StatelessWidget {
           children: [
             Text(
               "Create a New Task",
-              style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold, color: Color(0xFF8345B6)),
+              style: TextStyle(
+                  fontSize: 22,
+                  fontWeight: FontWeight.bold,
+                  color: Color(0xFF8345B6)),
             ),
             SizedBox(height: 10),
             TextField(
