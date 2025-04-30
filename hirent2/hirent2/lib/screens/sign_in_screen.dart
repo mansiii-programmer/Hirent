@@ -1,23 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/home_screen.dart';
-
-class HirentApp extends StatelessWidget {
-  const HirentApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const SignInPage(),
-      routes: {
-        '/homescreen': (context) => const HomeScreen(),
-      },
-    );
-  }
-}
+import 'package:hirent2/screens/seeker_main_screen.dart';
+import 'package:hirent2/screens/provider_main_screen.dart';
 
 class SignInPage extends StatefulWidget {
-  const SignInPage({super.key});
+  final String selectedRole; // <-- receives role
+
+  const SignInPage({super.key, required this.selectedRole});
 
   @override
   SignInPageState createState() => SignInPageState();
@@ -50,24 +38,34 @@ class SignInPageState extends State<SignInPage> {
 
   void _validateForm() {
     if (_formKey.currentState!.validate()) {
+      if (widget.selectedRole == 'Seeker') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => SeekerMainScreen()),
+        );
+      } else if (widget.selectedRole == 'Provider') {
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => ProviderMainScreen()),
+        );
+      }
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Login Successful")),
+        const SnackBar(content: Text("Please fill in all fields correctly")),
       );
-      Navigator.pushReplacementNamed(context, '/homescreen');
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // white background
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 24.0),
         child: Form(
           key: _formKey,
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
+          child: ListView(
+            padding: const EdgeInsets.only(top: 100),
             children: [
               const Center(
                 child: Text(
@@ -75,25 +73,19 @@ class SignInPageState extends State<SignInPage> {
                   style: TextStyle(
                     fontSize: 22,
                     fontWeight: FontWeight.bold,
-                    color: Color(0xFF9768CF), // purple text
+                    color: Color(0xFF9768CF),
                   ),
                 ),
               ),
               const SizedBox(height: 30),
-
-              // Email label
-              const Text(
-                'Email',
-                style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB)),
-              ),
+              const Text('Email',
+                  style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB))),
               const SizedBox(height: 5),
-
-              // Email input field
               TextFormField(
                 controller: _emailController,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.grey[300], // light grey background
+                  fillColor: Colors.grey[300],
                   hintText: 'Enter your email',
                   hintStyle: const TextStyle(color: Colors.black54),
                   border: OutlineInputBorder(
@@ -104,21 +96,15 @@ class SignInPageState extends State<SignInPage> {
                 validator: _validateEmail,
               ),
               const SizedBox(height: 20),
-
-              // Password label
-              const Text(
-                'Password',
-                style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB)),
-              ),
+              const Text('Password',
+                  style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB))),
               const SizedBox(height: 5),
-
-              // Password input field
               TextFormField(
                 controller: _passwordController,
                 obscureText: _obscurePassword,
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.grey[300], // light grey background
+                  fillColor: Colors.grey[300],
                   hintText: 'Enter your password',
                   hintStyle: const TextStyle(color: Colors.black54),
                   border: OutlineInputBorder(
@@ -127,7 +113,9 @@ class SignInPageState extends State<SignInPage> {
                   ),
                   suffixIcon: IconButton(
                     icon: Icon(
-                      _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                      _obscurePassword
+                          ? Icons.visibility_off
+                          : Icons.visibility,
                       color: Colors.black54,
                     ),
                     onPressed: () {
@@ -139,35 +127,18 @@ class SignInPageState extends State<SignInPage> {
                 ),
                 validator: _validatePassword,
               ),
-              const SizedBox(height: 10),
-
-              // Forgot password text
-              Align(
-                alignment: Alignment.centerRight,
-                child: TextButton(
-                  onPressed: () {
-                    // Forgot password logic
-                  },
-                  child: const Text(
-                    'Forgot Password?',
-                    style: TextStyle(color: Color(0xFFB78BDB), fontSize: 14),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Login button
+              const SizedBox(height: 30),
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Color(0xFFB78BDB), // purple button
+                    backgroundColor: const Color(0xFFB78BDB),
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: _validateForm, // Button to validate form
+                  onPressed: _validateForm,
                   child: const Text(
                     'Login',
                     style: TextStyle(fontSize: 16, color: Colors.black),

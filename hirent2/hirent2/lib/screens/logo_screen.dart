@@ -18,7 +18,8 @@ class LogoScreen extends StatelessWidget {
           Center(
             child: Container(
               padding: const EdgeInsets.all(16),
-              color: Colors.black.withOpacity(0.5), // slight transparency
+              color: Colors.black
+                  .withAlpha((255 * 0.6).toInt()), // slight transparency
               child: const Text(
                 'Welcome to Hirent',
                 style: TextStyle(

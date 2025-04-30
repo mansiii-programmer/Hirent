@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 // ignore: unused_import
-import 'package:hirent2/main.dart';
 import 'package:hirent2/screens/main.dart';
 
 void main() {

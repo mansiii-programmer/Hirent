@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hirent2/screens/your_tasks.dart';
+import 'package:hirent2/screens/payment_method.dart'; // ✅ Make sure this file and class exist
 
 void main() {
   runApp(MyApp());
@@ -66,8 +67,8 @@ class ProfileSettingsPage extends StatelessWidget {
                   settingsOption(Icons.location_on, "Address", context, null),
                   settingsOption(
                       Icons.checklist, "Your tasks", context, YourTasksPage()),
-                  settingsOption(
-                      Icons.payment, "Payment Methods", context, null),
+                  settingsOption(Icons.payment, "Payment Methods", context,
+                      PaymentMethodPage()), // ✅ Connected
                   settingsOption(Icons.settings, "Settings", context, null),
                   settingsOption(
                       Icons.account_balance_wallet, "Wallet", context, null),

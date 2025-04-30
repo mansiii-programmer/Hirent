@@ -4,7 +4,10 @@ import 'package:hirent2/screens/post_task_screen.dart';
 import 'package:hirent2/screens/profile_screen.dart';
 
 class HomeScreen extends StatelessWidget {
-  const HomeScreen({super.key});
+  final bool isCurrentlySeeker;
+
+  // Constructor now accepts isCurrentlySeeker
+  const HomeScreen({super.key, required this.isCurrentlySeeker});
 
   @override
   Widget build(BuildContext context) {
@@ -56,13 +59,22 @@ class HomeScreen extends StatelessWidget {
           ),
           const SizedBox(height: 20),
 
-          // buttons for different pages
-          _buildTaskCard(context, Icons.edit, 'Your Task',
-              'Post and monitor your task.', PostTaskPage()),
-          _buildTaskCard(context, Icons.chat, 'Chat',
-              'Communicate and negotiate prices.', const ChatScreen()),
-          _buildTaskCard(context, Icons.person, 'Profile',
-              'Manage and view your profile.', ProfileSettingsPage()),
+          // Render UI based on isCurrentlySeeker flag
+          if (isCurrentlySeeker) ...[
+            // Seekers: Show options relevant to seekers
+            _buildTaskCard(context, Icons.chat, 'Chat',
+                'Communicate and negotiate prices.', const ChatScreen()),
+            _buildTaskCard(context, Icons.person, 'Profile',
+                'Manage and view your profile.', ProfileSettingsPage()),
+          ] else ...[
+            // Providers: Show options relevant to providers
+            _buildTaskCard(context, Icons.edit, 'Your Task',
+                'Post and monitor your task.', PostTaskPage()),
+            _buildTaskCard(context, Icons.chat, 'Chat',
+                'Communicate and negotiate prices.', const ChatScreen()),
+            _buildTaskCard(context, Icons.person, 'Profile',
+                'Manage and view your profile.', ProfileSettingsPage()),
+          ],
         ],
       ),
 

@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 
 class ChatNegotiationPage extends StatelessWidget {
+  const ChatNegotiationPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
