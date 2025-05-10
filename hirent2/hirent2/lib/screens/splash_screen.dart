@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/sign_in_screen.dart';
+import 'package:hirent2/screens/role_selection.dart';
+import 'package:hirent2/screens/home_screen.dart'; // Assuming you have this file for home screen
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -9,25 +10,57 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
+  bool isCurrentlySeeker =
+      false; // You should replace this with your actual session or login status check
+
   @override
   void initState() {
     super.initState();
-    // auto navigate after 3 seconds
+    // Auto navigate after 3 seconds based on login/session status
     Future.delayed(const Duration(seconds: 3), () {
+      navigateBasedOnLoginStatus();
+    });
+  }
+
+  void navigateBasedOnLoginStatus() async {
+    // Check if the user is logged in and if they're a Seeker or Provider
+    bool isLoggedIn =
+        await checkLoginStatus(); // Replace with actual login status check
+
+    if (isLoggedIn) {
+      // If user is logged in, navigate to the correct home screen based on `isCurrentlySeeker`
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SignInPage()),
+        MaterialPageRoute(
+          builder: (context) =>
+              HomeScreen(isCurrentlySeeker: isCurrentlySeeker),
+        ),
       );
-    });
+    } else {
+      // If user is not logged in, navigate to the RoleSelectionPage
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(
+          builder: (context) =>
+              RoleSelectionPage(isCurrentlySeeker: isCurrentlySeeker),
+        ),
+      );
+    }
+  }
+
+  Future<bool> checkLoginStatus() async {
+    // Replace with your actual login status check (e.g., shared preferences, Firebase, etc.)
+    // For now, we simulate that the user is not logged in.
+    return false; // Simulate logged out user
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: Stack(
-        fit: StackFit.expand, // ensures full-screen coverage
+        fit: StackFit.expand, // Ensures full-screen coverage
         children: [
-          // background gradient
+          // Background gradient
           Container(
             decoration: const BoxDecoration(
               gradient: LinearGradient(
@@ -36,18 +69,18 @@ class _SplashScreenState extends State<SplashScreen> {
                 colors: [
                   Colors.black,
                   Colors.black,
-                  Color(0xff7B6190), // exact purple color
+                  Color(0xff7B6190), // Purple color
                 ],
-                stops: [0.0, 0.7, 1.0], // smooth transition
+                stops: [0.0, 0.7, 1.0], // Smooth transition
               ),
             ),
           ),
-          // centered logo image
+          // Centered logo image
           Center(
             child: Image.asset(
               'assets/images/hirentlogo.jpg',
-              width: 200, // adjust size as needed
-              fit: BoxFit.contain, // ensures proper scaling
+              width: 200, // Adjust size as needed
+              fit: BoxFit.contain, // Ensures proper scaling
             ),
           ),
         ],

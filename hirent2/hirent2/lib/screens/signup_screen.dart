@@ -14,10 +14,12 @@ class HirentApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: SignUpScreen(),
+      home: const SignUpScreen(),
       routes: {
-        '/homescreen': (context) => const HomeScreen(),
-        '/signin': (context) => const SignInPage(),
+        '/homescreen': (context) => const HomeScreen(
+              isCurrentlySeeker: true,
+            ),
+        '/signin': (context) => const SignInPage(selectedRole: 'Seeker'),
         '/otp': (context) => const OTPVerificationPage(),
       },
     );
@@ -54,7 +56,7 @@ class SignUpScreenState extends State<SignUpScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // ❌ Removed gradient, set background to white
+      backgroundColor: Colors.white,
       body: Padding(
         padding: const EdgeInsets.symmetric(horizontal: 30),
         child: Column(
@@ -67,12 +69,11 @@ class SignUpScreenState extends State<SignUpScreen> {
                 style: TextStyle(
                   fontSize: 22,
                   fontWeight: FontWeight.bold,
-                  color: Color(0xFF9768CF), // 💜 Purple text
+                  color: Color(0xFF9768CF), // Purple text
                 ),
               ),
             ),
             const SizedBox(height: 10),
-
             const Center(
               child: Text(
                 "Enter your email to sign up for this app",
@@ -97,7 +98,7 @@ class SignUpScreenState extends State<SignUpScreen> {
                 style: const TextStyle(color: Colors.black),
                 decoration: InputDecoration(
                   filled: true,
-                  fillColor: Colors.grey[300], // 🔲 Light grey input background
+                  fillColor: Colors.grey[300], // Light grey background
                   hintText: "email@domain.com",
                   hintStyle: const TextStyle(color: Colors.black54),
                   border: OutlineInputBorder(
@@ -114,7 +115,7 @@ class SignUpScreenState extends State<SignUpScreen> {
               width: double.infinity,
               child: ElevatedButton(
                 style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFB78BDB), // 💜 Purple button
+                  backgroundColor: const Color(0xFFB78BDB), // Purple button
                   padding: const EdgeInsets.symmetric(vertical: 12),
                   shape: RoundedRectangleBorder(
                     borderRadius: BorderRadius.circular(10),
@@ -123,7 +124,8 @@ class SignUpScreenState extends State<SignUpScreen> {
                 onPressed: _continue,
                 child: const Text(
                   "Continue",
-                  style: TextStyle(color: Colors.black, fontSize: 16), // ⬛ Black text
+                  style: TextStyle(
+                      color: Colors.black, fontSize: 16), // Black text
                 ),
               ),
             ),
@@ -133,7 +135,7 @@ class SignUpScreenState extends State<SignUpScreen> {
             const Center(
               child: Text(
                 "or",
-                style: TextStyle(color: Color (0xFF828282), fontSize: 14),
+                style: TextStyle(color: Color(0xFF828282), fontSize: 14),
               ),
             ),
             const SizedBox(height: 10),
