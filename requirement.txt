@@ -2,3 +2,7 @@ fastapi
 uvicorn
 pymongo
 pydantic
+passlib
+python-dotenv
+passlib[bcrypt]
+python-jose[cryptography]
