@@ -14,6 +14,7 @@ if not mongo_uri:
 client = pymongo.MongoClient(mongo_uri)
 db = client["hirent"]
 
+messages_collection = db["messages"]
 users_collection = db["users"]
 tasks_collection = db["tasks"]
 
