@@ -1,14 +1,13 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from models.user import User
+from database.connection import db
 
-router = APIRouter(
-    prefix="/users",
-    tags=["users"]
-)
+router = APIRouter()
 
-fake_users = []
-
-@router.post("/")
-def create_user(user: User):
-    fake_users.append(user)
-    return {"msg": "User created", "user": user}
+@router.post("/register")
+async def register_user(user: User):
+    existing = await db.users.find_one({"email": user.email})
+    if existing:
+        raise HTTPException(status_code=400, detail="User already exists")
+    await db.users.insert_one(user.dict())
+    return {"message": "User registered successfully"}
