@@ -12,9 +12,10 @@ dependencies:
   flutter:
     sdk: flutter
   cupertino_icons: ^1.0.8
-  qr_code_scanner: ^0.5.2
+  pin_code_fields: ^8.0.0
   # For UPI payment (you can use a plugin or custom integration)
   upi_payment: ^0.0.1
+  lucide_icons: ^0.257.0
 
 dev_dependencies:
   flutter_test:

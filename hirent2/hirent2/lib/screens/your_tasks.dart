@@ -1,152 +1,221 @@
 import 'package:flutter/material.dart';
 
-void main() {
-  runApp(MyApp());
-}
-
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: YourTasksPage(),
-    );
-  }
-}
-
 class YourTasksPage extends StatelessWidget {
   const YourTasksPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color.fromARGB(245, 234, 222, 222),
-      body: Column(
-        children: [
-          Container(
-            padding: EdgeInsets.symmetric(vertical: 20),
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [
-                  const Color.fromARGB(255, 94, 0, 110),
-                  const Color.fromARGB(255, 123, 0, 172)
-                ],
-                begin: Alignment.topCenter,
-                end: Alignment.bottomCenter,
-              ),
-              borderRadius: BorderRadius.only(
-                bottomLeft: Radius.circular(20),
-                bottomRight: Radius.circular(20),
-              ),
-            ),
-            child: Column(
-              children: [
-                Align(
-                  alignment: Alignment.topLeft,
-                  child: IconButton(
-                    icon: Icon(Icons.arrow_back, color: Colors.white),
-                    onPressed: () {},
-                  ),
-                ),
-                Text(
-                  "Your Tasks",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                ),
-                SizedBox(height: 10),
-                CircleAvatar(
-                  radius: 40,
-                  backgroundImage: AssetImage('assets/images/avatar.jpg'),
-                ),
-                SizedBox(height: 10),
-                Text(
-                  "Ishika Bhardwaaj",
-                  style: TextStyle(
-                    fontSize: 18,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.black,
-                  ),
-                ),
-                Text(
-                  "Posting one-time and short gigs.\nLet’s work together",
-                  textAlign: TextAlign.center,
-                  style: TextStyle(color: Colors.black54),
-                ),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Icon(Icons.star, color: Colors.yellow, size: 20),
-                    SizedBox(width: 5),
-                    Text("5/5", style: TextStyle(fontWeight: FontWeight.bold)),
-                  ],
-                ),
-              ],
-            ),
-          ),
-          Padding(
-            padding: EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-            child: Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                Text(
-                  "Task Posted",
-                  style: TextStyle(
-                      fontSize: 18,
+    return DefaultTabController(
+      length: 3,
+      child: Scaffold(
+        backgroundColor: const Color(0xFFF9F9F6),
+        body: Column(
+          children: [
+            // Header and Tabs
+            Container(
+              padding: const EdgeInsets.fromLTRB(16, 40, 16, 10),
+              color: Colors.white,
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  const Text(
+                    'Your Tasks',
+                    style: TextStyle(
+                      fontSize: 22,
                       fontWeight: FontWeight.bold,
-                      color: Colors.white),
-                ),
-                Text(
-                  "See All",
-                  style: TextStyle(
-                    fontSize: 16,
-                    color: Colors.blue,
-                    fontWeight: FontWeight.bold,
+                    ),
                   ),
-                ),
-              ],
+                  const SizedBox(height: 12),
+                  Container(
+                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      decoration: BoxDecoration(
+                        color: const Color(0xFFF1EEE5),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: TabBar(
+                        indicator: BoxDecoration(
+                          border: Border(
+                            bottom: BorderSide(
+                              color: Color(
+                                  0xFF2684FC), // Match soft blue from the screenshot
+                              width: 3.0,
+                            ),
+                          ),
+                        ),
+                        labelColor:
+                            Color(0xFF2684FC), // Match blue icon + text color
+                        unselectedLabelColor: Colors.brown.shade400,
+                        tabs: const [
+                          Tab(icon: Icon(Icons.inventory), text: 'All'),
+                          Tab(icon: Icon(Icons.schedule), text: 'Open'),
+                          Tab(
+                              icon: Icon(Icons.check_circle),
+                              text: 'Completed'),
+                        ],
+                      )),
+                ],
+              ),
             ),
+
+            // Tab Views
+            Expanded(
+              child: TabBarView(
+                children: [
+                  taskListView(),
+                  taskListView(), // Placeholder duplicate for Open
+                  taskListView(), // Placeholder duplicate for Completed
+                ],
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget taskListView() {
+    return SingleChildScrollView(
+      padding: const EdgeInsets.all(12),
+      child: Column(
+        children: [
+          buildTaskCard(
+            category: "Cleaning",
+            title: "Cleaning Task",
+            desc:
+                "This is a cleaning task that needs to be done. The task involves helping with cleaning services.",
+            location: "San Francisco, CA",
+            timeAgo: "1 day ago",
+            price: "₹16",
+            imageUrl:
+                "https://images.unsplash.com/photo-1581579185169-fdcfb0b7d1a9",
+            color: Colors.blue,
           ),
-          Expanded(
-            child: ListView(
-              scrollDirection: Axis.horizontal,
-              padding: EdgeInsets.symmetric(horizontal: 16),
-              children: [
-                taskCard("Plumbing"),
-                taskCard("Assignment"),
-                taskCard("Delivery"),
-              ],
-            ),
+          buildTaskCard(
+            category: "Babysitting",
+            title: "Babysitting Task",
+            desc:
+                "This is a babysitting task that needs to be done. The task involves helping with babysitting services.",
+            location: "New York, NY",
+            timeAgo: "4 days ago",
+            price: "₹50",
+            imageUrl: "https://invalid.url/image.png", // to test fallback
+            color: Colors.pink,
           ),
         ],
       ),
     );
   }
 
-  Widget taskCard(String taskName) {
-    return Container(
-      width: 150,
-      margin: EdgeInsets.only(right: 10),
-      padding: EdgeInsets.all(12),
-      decoration: BoxDecoration(
-        color: const Color.fromARGB(255, 78, 78, 78),
-        borderRadius: BorderRadius.circular(12),
-      ),
+  Widget buildTaskCard({
+    required String category,
+    required String title,
+    required String desc,
+    required String location,
+    required String timeAgo,
+    required String price,
+    required String imageUrl,
+    required Color color,
+  }) {
+    return Card(
+      margin: const EdgeInsets.symmetric(vertical: 10),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(16)),
+      elevation: 2,
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Text(
-            "Task: $taskName",
-            style: TextStyle(fontWeight: FontWeight.bold),
+          // Image with fallback and category badge
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image.network(
+                  imageUrl,
+                  height: 120,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      height: 120,
+                      width: double.infinity,
+                      color: Colors.grey.shade300,
+                      child: const Icon(Icons.image_not_supported, size: 50),
+                    );
+                  },
+                ),
+              ),
+              Positioned(
+                top: 10,
+                left: 10,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: color,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    category,
+                    style: const TextStyle(
+                        color: Colors.white, fontWeight: FontWeight.bold),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 10,
+                right: 10,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    timeAgo,
+                    style: const TextStyle(color: Colors.white, fontSize: 12),
+                  ),
+                ),
+              ),
+            ],
           ),
-          SizedBox(height: 5),
-          Text(
-            "Description:\n.................\n.................\n.................",
-            style: TextStyle(fontSize: 12, color: Colors.black54),
+
+          // Task info
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(title,
+                    style: const TextStyle(
+                        fontSize: 16, fontWeight: FontWeight.bold)),
+                const SizedBox(height: 4),
+                Text(desc,
+                    style:
+                        const TextStyle(color: Colors.black87, fontSize: 14)),
+                const SizedBox(height: 8),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 16),
+                    const SizedBox(width: 4),
+                    Text(location, style: const TextStyle(fontSize: 13)),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 4),
+                      decoration: BoxDecoration(
+                        color: Colors.green.shade100,
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      child: Text(
+                        price,
+                        style: const TextStyle(fontWeight: FontWeight.bold),
+                      ),
+                    )
+                  ],
+                ),
+              ],
+            ),
           ),
         ],
       ),

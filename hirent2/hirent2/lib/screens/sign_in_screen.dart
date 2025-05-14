@@ -3,19 +3,18 @@ import 'package:hirent2/screens/seeker_main_screen.dart';
 import 'package:hirent2/screens/provider_main_screen.dart';
 
 class SignInPage extends StatefulWidget {
-  final String selectedRole; // <-- receives role
-
-  const SignInPage({super.key, required this.selectedRole});
+  const SignInPage({super.key});
 
   @override
-  SignInPageState createState() => SignInPageState();
+  State<SignInPage> createState() => _SignInPageState();
 }
 
-class SignInPageState extends State<SignInPage> {
+class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   bool _obscurePassword = true;
+  String _selectedRole = 'Task Seeker';
 
   String? _validateEmail(String? value) {
     if (value == null || value.isEmpty) {
@@ -38,12 +37,12 @@ class SignInPageState extends State<SignInPage> {
 
   void _validateForm() {
     if (_formKey.currentState!.validate()) {
-      if (widget.selectedRole == 'Seeker') {
+      if (_selectedRole == 'Task Seeker') {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => SeekerMainScreen()),
         );
-      } else if (widget.selectedRole == 'Provider') {
+      } else {
         Navigator.pushReplacement(
           context,
           MaterialPageRoute(builder: (context) => ProviderMainScreen()),
@@ -56,96 +55,220 @@ class SignInPageState extends State<SignInPage> {
     }
   }
 
+  InputDecoration _inputDecoration(String hintText) {
+    return InputDecoration(
+      hintText: hintText,
+      filled: true,
+      fillColor: Colors.grey[200],
+      border: OutlineInputBorder(
+        borderRadius: BorderRadius.circular(12),
+        borderSide: BorderSide.none,
+      ),
+      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+    );
+  }
+
+  Widget _buildRoleSelector() {
+    return Column(
+      children: [
+        _buildRoleOption('Task Seeker', 'Find and complete tasks'),
+        const SizedBox(height: 12),
+        _buildRoleOption('Task Provider', 'Post tasks and hire'),
+      ],
+    );
+  }
+
+  Widget _buildRoleOption(String role, String subtitle) {
+    final isSelected = _selectedRole == role;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          _selectedRole = role;
+        });
+      },
+      child: Container(
+        width: double.infinity,
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          borderRadius: BorderRadius.circular(12),
+          border: Border.all(
+            color: isSelected ? const Color(0xFF018078) : Colors.grey.shade300,
+            width: 2,
+          ),
+        ),
+        child: Row(
+          children: [
+            Radio<String>(
+              value: role,
+              groupValue: _selectedRole,
+              onChanged: (value) {
+                setState(() {
+                  _selectedRole = value!;
+                });
+              },
+            ),
+            const SizedBox(width: 8),
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Text(
+                    role,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 16,
+                      color: Colors.black,
+                    ),
+                  ),
+                  const SizedBox(height: 4),
+                  Text(
+                    subtitle,
+                    style: TextStyle(
+                      fontSize: 12,
+                      color: Colors.grey[600],
+                    ),
+                  ),
+                ],
+              ),
+            )
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
-        child: Form(
-          key: _formKey,
-          child: ListView(
-            padding: const EdgeInsets.only(top: 100),
-            children: [
-              const Center(
-                child: Text(
-                  'HI, WELCOME BACK!',
-                  style: TextStyle(
-                    fontSize: 22,
-                    fontWeight: FontWeight.bold,
-                    color: Color(0xFF9768CF),
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-              const Text('Email',
-                  style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB))),
-              const SizedBox(height: 5),
-              TextFormField(
-                controller: _emailController,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[300],
-                  hintText: 'Enter your email',
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                ),
-                validator: _validateEmail,
-              ),
-              const SizedBox(height: 20),
-              const Text('Password',
-                  style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB))),
-              const SizedBox(height: 5),
-              TextFormField(
-                controller: _passwordController,
-                obscureText: _obscurePassword,
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[300],
-                  hintText: 'Enter your password',
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _obscurePassword
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                      color: Colors.black54,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _obscurePassword = !_obscurePassword;
-                      });
-                    },
-                  ),
-                ),
-                validator: _validatePassword,
-              ),
-              const SizedBox(height: 30),
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color(0xFFB78BDB),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(10),
+      backgroundColor: const Color(0xFFFDFDF9),
+      body: Center(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.symmetric(horizontal: 24),
+          child: Form(
+            key: _formKey,
+            child: ConstrainedBox(
+              constraints: const BoxConstraints(maxWidth: 400),
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'HIRENT',
+                    style: TextStyle(
+                      fontSize: 32,
+                      fontWeight: FontWeight.bold,
+                      color: Color(0xFF018078),
+                      letterSpacing: 1.5,
                     ),
                   ),
-                  onPressed: _validateForm,
-                  child: const Text(
-                    'Login',
-                    style: TextStyle(fontSize: 16, color: Colors.black),
+                  const SizedBox(height: 6),
+                  const Text(
+                    'Welcome back',
+                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
                   ),
-                ),
+                  const SizedBox(height: 4),
+                  const Text(
+                    'Log in to your account',
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                  const SizedBox(height: 30),
+
+                  _buildRoleSelector(),
+                  const SizedBox(height: 25),
+
+                  TextFormField(
+                    controller: _emailController,
+                    validator: _validateEmail,
+                    decoration: _inputDecoration('you@example.com'),
+                  ),
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _passwordController,
+                    obscureText: _obscurePassword,
+                    validator: _validatePassword,
+                    decoration: _inputDecoration('Enter your password').copyWith(
+                      suffixIcon: IconButton(
+                        icon: Icon(
+                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          color: Colors.grey,
+                        ),
+                        onPressed: () {
+                          setState(() {
+                            _obscurePassword = !_obscurePassword;
+                          });
+                        },
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Row(
+                        children: [
+                          Checkbox(value: false, onChanged: (_) {}),
+                          const Text("Remember me"),
+                        ],
+                      ),
+                      TextButton(
+                        onPressed: () {},
+                        child: const Text("Forgot password?"),
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 10),
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: _validateForm,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFF018078),
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Log in',
+                        style: TextStyle(fontSize: 16, color: Colors.white),
+                      ),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+                  Row(
+                    children: const [
+                      Expanded(child: Divider()),
+                      Padding(
+                        padding: EdgeInsets.symmetric(horizontal: 8),
+                        child: Text(
+                          "Don't have an account?",
+                          style: TextStyle(color: Colors.grey),
+                        ),
+                      ),
+                      Expanded(child: Divider()),
+                    ],
+                  ),
+                  const SizedBox(height: 16),
+                  SizedBox(
+                    width: double.infinity,
+                    child: OutlinedButton(
+                      onPressed: () {
+                        // Navigate to SignUp screen
+                      },
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                      ),
+                      child: const Text(
+                        'Sign up',
+                        style: TextStyle(fontSize: 16),
+                      ),
+                    ),
+                  ),
+                ],
               ),
-            ],
+            ),
           ),
         ),
       ),

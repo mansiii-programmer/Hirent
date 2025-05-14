@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/communication_screen.dart';
 import 'package:hirent2/screens/chatting_screen.dart';
 import 'package:hirent2/screens/tp_homepage.dart';
 import 'package:hirent2/screens/post_task_screen.dart';
@@ -17,7 +16,6 @@ class _SeekerMainScreenState extends State<ProviderMainScreen> {
 
   final List<Widget> _pages = [
     HomePage(),
-    ChatNegotiationPage(),
     ChatScreen(),
     PostTaskPage(),
     ProfileSettingsPage(),

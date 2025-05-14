@@ -16,10 +16,8 @@ class HirentApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       home: const SignUpScreen(),
       routes: {
-        '/homescreen': (context) => const HomeScreen(
-              isCurrentlySeeker: true,
-            ),
-        '/signin': (context) => const SignInPage(selectedRole: 'Seeker'),
+        '/homescreen': (context) => const HomeScreen(isCurrentlySeeker: true),
+        '/signin': (context) => const SignInPage(),
         '/otp': (context) => const OTPVerificationPage(),
       },
     );
@@ -30,22 +28,18 @@ class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key});
 
   @override
-  SignUpScreenState createState() => SignUpScreenState();
+  State<SignUpScreen> createState() => _SignUpScreenState();
 }
 
-class SignUpScreenState extends State<SignUpScreen> {
+class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
   final TextEditingController _emailController = TextEditingController();
+  final TextEditingController _nameController = TextEditingController();
+  final TextEditingController _passwordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Required*';
-    } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$')
-        .hasMatch(value)) {
-      return 'Enter a valid email';
-    }
-    return null;
-  }
+  bool isSeeker = true;
 
   void _continue() {
     if (_formKey.currentState!.validate()) {
@@ -53,118 +47,233 @@ class SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
+  String? _validateEmail(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Required*';
+    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$')
+        .hasMatch(value.trim())) {
+      return 'Enter a valid email';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.isEmpty) {
+      return 'Required*';
+    } else if (value.length < 6) {
+      return 'Password must be at least 6 characters';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value != _passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 30),
+      body: SingleChildScrollView(
+        padding: const EdgeInsets.symmetric(horizontal: 30, vertical: 60),
+        child: Form(
+          key: _formKey,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              const Center(
+                child: Text(
+                  "HIRENT",
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal),
+                ),
+              ),
+              const SizedBox(height: 10),
+              const Center(
+                child: Text(
+                  "Create your account",
+                  style: TextStyle(fontSize: 18, color: Colors.black87),
+                ),
+              ),
+              const SizedBox(height: 30),
+              const Text("I am registering as a:"),
+              const SizedBox(height: 10),
+              Wrap(
+                spacing: 10,
+                runSpacing: 10,
+                children: [
+                  _roleOption("Task Seeker",
+                      "Find and complete tasks to earn money", true),
+                  _roleOption("Task Provider",
+                      "Post tasks and hire skilled individuals", false),
+                ],
+              ),
+              const SizedBox(height: 20),
+              _buildInputField(
+                  controller: _nameController,
+                  label: "Full Name",
+                  hint: "Your full name"),
+              const SizedBox(height: 15),
+              _buildInputField(
+                  controller: _emailController,
+                  label: "Email address",
+                  hint: "you@example.com",
+                  validator: _validateEmail),
+              const SizedBox(height: 15),
+              _buildInputField(
+                  controller: _passwordController,
+                  label: "Password",
+                  hint: "Enter your password",
+                  obscureText: true,
+                  validator: _validatePassword),
+              const SizedBox(height: 15),
+              _buildInputField(
+                  controller: _confirmPasswordController,
+                  label: "Confirm Password",
+                  hint: "Re-enter password",
+                  obscureText: true,
+                  validator: _validateConfirmPassword),
+              const SizedBox(height: 20),
+              SizedBox(
+                width: double.infinity,
+                child: ElevatedButton(
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: Colors.teal,
+                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10)),
+                  ),
+                  onPressed: _continue,
+                  child: const Text(
+                    "Sign up",
+                    style: TextStyle(color: Colors.white, fontSize: 16),
+                  ),
+                ),
+              ),
+              const SizedBox(height: 20),
+              Row(
+                children: const [
+                  Expanded(child: Divider(thickness: 1)),
+                  Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 10),
+                    child: Text("Already have an account?"),
+                  ),
+                  Expanded(child: Divider(thickness: 1)),
+                ],
+              ),
+              const SizedBox(height: 10),
+              Center(
+                child: OutlinedButton(
+                  onPressed: () => Navigator.pushNamed(context, '/signin'),
+                  style: OutlinedButton.styleFrom(
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 14),
+                    side: const BorderSide(color: Colors.grey),
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                  ),
+                  child: const Text(
+                    "Log in",
+                    style: TextStyle(fontSize: 16, color: Colors.black87),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _roleOption(String title, String description, bool seekerOption) {
+  bool selected = isSeeker == seekerOption;
+  return SizedBox(
+    width: (MediaQuery.of(context).size.width - 70) / 2,
+    child: GestureDetector(
+      onTap: () {
+        setState(() {
+          isSeeker = seekerOption;
+        });
+      },
+      child: Container(
+        padding: const EdgeInsets.all(12),
+        decoration: BoxDecoration(
+          color: selected ? Colors.teal.shade50 : Colors.white,
+          border: Border.all(
+            color: selected ? Colors.teal : Colors.grey.shade300,
+          ),
+          borderRadius: BorderRadius.circular(12),
+        ),
         child: Column(
-          mainAxisAlignment: MainAxisAlignment.center,
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Center(
-              child: Text(
-                "Create an Account",
-                style: TextStyle(
-                  fontSize: 22,
-                  fontWeight: FontWeight.bold,
-                  color: Color(0xFF9768CF), // Purple text
+            Row(
+              children: [
+                Radio<bool>(
+                  value: seekerOption,
+                  groupValue: isSeeker,
+                  onChanged: (val) => setState(() {
+                    isSeeker = val!;
+                  }),
+                  activeColor: Colors.teal,
                 ),
-              ),
-            ),
-            const SizedBox(height: 10),
-            const Center(
-              child: Text(
-                "Enter your email to sign up for this app",
-                style: TextStyle(fontSize: 14, color: Color(0xFFB78BDB)),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Email label
-            const Text(
-              'Email',
-              style: TextStyle(fontSize: 14, color: Color(0xFF000000)),
-            ),
-            const SizedBox(height: 5),
-
-            // Email input field
-            Form(
-              key: _formKey,
-              child: TextFormField(
-                controller: _emailController,
-                validator: _validateEmail,
-                style: const TextStyle(color: Colors.black),
-                decoration: InputDecoration(
-                  filled: true,
-                  fillColor: Colors.grey[300], // Light grey background
-                  hintText: "email@domain.com",
-                  hintStyle: const TextStyle(color: Colors.black54),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(10),
-                    borderSide: BorderSide.none,
+                Flexible(
+                  child: Text(
+                    title,
+                    style: const TextStyle(
+                      fontWeight: FontWeight.bold,
+                      fontSize: 14,
+                    ),
                   ),
                 ),
-              ),
+              ],
             ),
-            const SizedBox(height: 20),
-
-            // Continue button
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFFB78BDB), // Purple button
-                  padding: const EdgeInsets.symmetric(vertical: 12),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10),
-                  ),
-                ),
-                onPressed: _continue,
-                child: const Text(
-                  "Continue",
-                  style: TextStyle(
-                      color: Colors.black, fontSize: 16), // Black text
-                ),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Or text
-            const Center(
-              child: Text(
-                "or",
-                style: TextStyle(color: Color(0xFF828282), fontSize: 14),
-              ),
-            ),
-            const SizedBox(height: 10),
-
-            // Sign in button
-            Center(
-              child: TextButton(
-                onPressed: () {
-                  Navigator.pushNamed(context, '/signin');
-                },
-                child: const Text(
-                  "Sign in",
-                  style: TextStyle(color: Color(0xFFB78BDB), fontSize: 16),
-                ),
-              ),
-            ),
-            const SizedBox(height: 20),
-
-            // Terms & Privacy
-            const Center(
-              child: Text(
-                "By clicking continue, you agree to our Terms of Service\nand Privacy Policy",
-                style: TextStyle(color: Color(0xFF9768CF), fontSize: 12),
-                textAlign: TextAlign.center,
-              ),
+            const SizedBox(height: 4),
+            Text(
+              description,
+              style: const TextStyle(fontSize: 12, color: Colors.black54),
             ),
           ],
         ),
       ),
+    ),
+  );
+}
+
+
+  Widget _buildInputField({
+    required TextEditingController controller,
+    required String label,
+    required String hint,
+    bool obscureText = false,
+    String? Function(String?)? validator,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label),
+        const SizedBox(height: 6),
+        TextFormField(
+          controller: controller,
+          obscureText: obscureText,
+          validator: validator,
+          decoration: InputDecoration(
+            hintText: hint,
+            filled: true,
+            fillColor: Colors.grey[200],
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(12),
+              borderSide: BorderSide.none,
+            ),
+          ),
+        ),
+      ],
     );
   }
 }

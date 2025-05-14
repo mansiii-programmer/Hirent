@@ -1,9 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:hirent2/screens/ts_homescreen.dart';
-import 'package:hirent2/screens/communication_screen.dart';
 import 'package:hirent2/screens/chatting_screen.dart';
-import 'package:hirent2/screens/profile_screen.dart';
 import 'package:hirent2/screens/your_tasks.dart';
+import 'package:hirent2/screens/profile_screen.dart';
 
 class SeekerMainScreen extends StatefulWidget {
   const SeekerMainScreen({super.key});
@@ -17,9 +16,8 @@ class _SeekerMainScreenState extends State<SeekerMainScreen> {
 
   final List<Widget> _pages = [
     TsHomePage(),
-    ChatNegotiationPage(),
-    ChatScreen(),
     YourTasksPage(),
+    ChatScreen(),
     ProfileSettingsPage(),
   ];
 
@@ -29,16 +27,33 @@ class _SeekerMainScreenState extends State<SeekerMainScreen> {
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         currentIndex: _selectedIndex,
-        selectedItemColor: Color(0xFFD8B4F8),
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Color(0xFFFAFAFA),
         onTap: (index) => setState(() => _selectedIndex = index),
+        type: BottomNavigationBarType.fixed,
+        backgroundColor: Colors.white,
+        elevation: 8,
+        selectedItemColor: Color(0xFF9B5DE5), // purple color
+        unselectedItemColor: Colors.grey,
+        showSelectedLabels: true,
+        showUnselectedLabels: false,
+        selectedFontSize: 12,
+        unselectedFontSize: 0,
         items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.message), label: 'Comm'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.list), label: 'Tasks'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.check_box_outlined),
+            label: 'Your Tasks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat_bubble_outline),
+            label: 'Chat',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person_outline),
+            label: 'Profile',
+          ),
         ],
       ),
     );

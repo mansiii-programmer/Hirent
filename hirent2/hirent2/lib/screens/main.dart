@@ -27,22 +27,24 @@ class HirentApp extends StatelessWidget {
       ),
       home: const SplashScreen(),
       routes: {
-        '/signin': (context) => SignInPage(selectedRole: 'Seeker'),
+        '/signin': (context) => SignInPage(),
         '/signup': (context) => SignUpScreen(),
         '/otp': (context) => const OTPVerificationPage(),
 
-        /// Main screens for roles
+        // Main screens
         '/seekerMain': (context) => const SeekerMainScreen(),
         '/providerMain': (context) => const ProviderMainScreen(),
 
-        /// Common screens
+        // Common screens
         '/profile': (context) => const ProfileSettingsPage(),
         '/yourtasks': (context) => const tasks.YourTasksPage(),
-        '/role': (context) => const RoleSelectionPage(isCurrentlySeeker: true),
 
-        /// 🔧 Missing routes added here
-        '/seekerLogin': (context) => SignInPage(selectedRole: 'Seeker'),
-        '/providerLogin': (context) => SignInPage(selectedRole: 'Provider'),
+        // ✅ Fixed: no parameters passed here
+        '/role': (context) => const RoleSelectionPage(),
+
+        // Login routes
+        '/seekerLogin': (context) => SignUpScreen(),
+        '/providerLogin': (context) => SignUpScreen(),
       },
     );
   }

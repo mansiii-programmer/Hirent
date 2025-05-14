@@ -1,169 +1,211 @@
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/ts_service_foodDelivery.dart';
-import 'package:hirent2/screens/ts_service_gardening.dart';
 
-class TsHomePage extends StatelessWidget {
+class Task {
+  final String category;
+  final String title;
+  final String description;
+  final String location;
+  final String timeAgo;
+  final String price;
+  final String imagePath;
+
+  Task({
+    required this.category,
+    required this.title,
+    required this.description,
+    required this.location,
+    required this.timeAgo,
+    required this.price,
+    required this.imagePath,
+  });
+}
+
+class TsHomePage extends StatefulWidget {
   const TsHomePage({super.key});
 
   @override
+  State<TsHomePage> createState() => _TsHomePageState();
+}
+
+class _TsHomePageState extends State<TsHomePage> {
+  final List<String> categories = [
+    "All",
+    "Cleaning",
+    "Babysitting",
+    "Gardening",
+    "Cooking",
+    "Pet Care",
+    "Tutoring",
+    "Shopping",
+    "Delivery"
+  ];
+
+  String selectedCategory = "All";
+
+  final List<Task> allTasks = [
+    Task(
+      category: "Cleaning",
+      title: "Cleaning Task",
+      description:
+          "This is a cleaning task that needs to be done. The task involves helping with cleaning services.",
+      location: "San Francisco, CA",
+      timeAgo: "1 day ago",
+      price: "₹16",
+      imagePath: "assets/cleaning.png",
+    ),
+    Task(
+      category: "Babysitting",
+      title: "Evening Babysitter",
+      description: "Need someone to babysit for 3 hours in the evening.",
+      location: "San Jose, CA",
+      timeAgo: "4 days ago",
+      price: "₹40",
+      imagePath: "assets/babysitting.jpg",
+    ),
+    Task(
+      category: "Cooking",
+      title: "Home Chef",
+      description: "Looking for someone to prepare home-cooked meals daily.",
+      location: "Oakland, CA",
+      timeAgo: "2 days ago",
+      price: "₹30",
+      imagePath: "assets/cooking.jpg",
+    ),
+  ];
+
+  @override
   Widget build(BuildContext context) {
+    final List<Task> filteredTasks = selectedCategory == "All"
+        ? allTasks
+        : allTasks
+            .where((task) => task.category
+                .toLowerCase()
+                .startsWith(selectedCategory.toLowerCase()))
+            .toList();
+
     return Scaffold(
-      backgroundColor: Colors.white,
+      backgroundColor: Colors.grey[50],
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: EdgeInsets.all(20),
+          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Top Search bar
+              // Header
               Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(
-                    child: TextField(
-                      decoration: InputDecoration(
-                        hintText: "Search for tasks",
-                        prefixIcon: Icon(Icons.search),
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(30),
-                          borderSide: BorderSide.none,
+                  Row(
+                    crossAxisAlignment: CrossAxisAlignment.center,
+                    children: [
+                      // Gradient HIRENT text
+                      ShaderMask(
+                        shaderCallback: (bounds) => const LinearGradient(
+                          colors: [
+                            Color(0xFF8E2DE2),
+                            Color.fromARGB(255, 196, 167, 211),
+                            Color.fromARGB(255, 137, 85, 164)
+                          ],
+                        ).createShader(
+                            Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+                        child: const Text(
+                          'HIRENT',
+                          style: TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w800,
+                            color: Colors
+                                .white, // Keep white for gradient to apply
+                            letterSpacing: 1.2,
+                          ),
                         ),
-                        filled: true,
-                        fillColor: Colors.grey[200],
                       ),
-                    ),
+                      const SizedBox(width: 8),
+                      // Task Seeker capsule
+                      Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 10, vertical: 4),
+                        decoration: BoxDecoration(
+                          color: Color(0xFFF3ECFF), // Light purple background
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        child: const Text(
+                          'Task Seeker',
+                          style: TextStyle(
+                            color: Colors.black87,
+                            fontSize: 13,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      ),
+                    ],
                   ),
+                  Icon(Icons.settings, color: Colors.grey[700]),
                 ],
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-              // Main Heading
-              Text(
-                "Hirent",
-                style: TextStyle(fontSize: 32, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
-              Text(
-                "Find local professionals for your tasks",
-                style: TextStyle(fontSize: 16, color: Colors.purple),
-              ),
-              SizedBox(height: 30),
-
-              // Services
-              Text(
-                "Services",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    serviceIcon(
-                      icon: Icons.shopping_bag,
-                      label: "Food Delivery",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                CategoryPage(category: "Food Delivery"),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(width: 20),
-                    serviceIcon(
-                      icon: Icons.grass,
-                      label: "Gardening",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                GardeningPage(), // Corrected navigation to GardeningPage
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(width: 20),
-                    serviceIcon(
-                      icon: Icons.plumbing,
-                      label: "Plumbing",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategoryPage(category: "Plumbing"),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(width: 20),
-                    serviceIcon(
-                      icon: Icons.assignment,
-                      label: "Assignment",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) =>
-                                CategoryPage(category: "Assignment"),
-                          ),
-                        );
-                      },
-                    ),
-                    SizedBox(width: 20),
-                    serviceIcon(
-                      icon: Icons.pets,
-                      label: "Pet Care",
-                      onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (_) => CategoryPage(category: "Pet Care"),
-                          ),
-                        );
-                      },
-                    ),
-                  ],
+              // Search Bar
+              Container(
+                padding: const EdgeInsets.symmetric(horizontal: 16),
+                decoration: BoxDecoration(
+                  color: Colors.grey[200],
+                  borderRadius: BorderRadius.circular(25),
+                ),
+                child: const TextField(
+                  decoration: InputDecoration(
+                    icon: Icon(Icons.search),
+                    hintText: "Search for tasks...",
+                    border: InputBorder.none,
+                  ),
                 ),
               ),
-              SizedBox(height: 30),
+              const SizedBox(height: 20),
 
-              // Featured Tasks
-              Text(
-                "Featured Tasks",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 20),
-              SingleChildScrollView(
-                scrollDirection: Axis.horizontal,
-                child: Row(
-                  children: [
-                    featuredTaskCard(
-                      "assets/blog.png",
-                      "Write a blog post",
-                      "\₹50",
-                      "John D.",
-                      "Lex Showcase LLC",
-                    ),
-                    featuredTaskCard(
-                      "assets/plumbing.png",
-                      "Fix kitchen sink",
-                      "\₹30",
-                      "Michael S.",
-                      "30 min",
-                    ),
-                    featuredTaskCard(
-                      "assets/dog.png",
-                      "Dog walking",
-                      "\₹30",
-                      "Sarah W.",
-                      "5:00 PM",
-                    ),
-                  ],
+              // Category Chips
+              SizedBox(
+                height: 40,
+                child: ListView.builder(
+                  scrollDirection: Axis.horizontal,
+                  itemCount: categories.length,
+                  itemBuilder: (context, index) {
+                    final category = categories[index];
+                    final isSelected = selectedCategory == category;
+                    return Padding(
+                      padding: const EdgeInsets.only(right: 8),
+                      child: ChoiceChip(
+                        label: Text(
+                          category,
+                          style: TextStyle(
+                            color:
+                                isSelected ? Colors.black87 : Colors.grey[800],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        selected: isSelected,
+                        onSelected: (_) {
+                          setState(() => selectedCategory = category);
+                        },
+                        selectedColor: Colors.white,
+                        backgroundColor: const Color(
+                            0xFFF0EEE9), // Light grey like your screenshot
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(10),
+                        ),
+                        elevation: isSelected ? 2 : 0,
+                      ),
+                    );
+                  },
                 ),
               ),
+              const SizedBox(height: 25),
+
+              const Text(
+                "Recommended Tasks",
+                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 16),
+
+              ...filteredTasks.map((task) => taskCard(task)).toList(),
             ],
           ),
         ),
@@ -171,94 +213,139 @@ class TsHomePage extends StatelessWidget {
     );
   }
 
-  // Service Icon Widget
-  Widget serviceIcon({
-    required IconData icon,
-    required String label,
-    VoidCallback? onTap,
-  }) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Column(
-        children: [
-          Card(
-            shape:
-                RoundedRectangleBorder(borderRadius: BorderRadius.circular(15)),
-            elevation: 4,
-            child: Container(
-              width: 80,
-              height: 80,
-              child: Icon(icon, size: 40, color: Colors.purple),
-            ),
-          ),
-          SizedBox(height: 8),
-          Text(label, style: TextStyle(fontWeight: FontWeight.w500)),
-        ],
-      ),
-    );
-  }
-
-  // Featured Task Card Widget
-  Widget featuredTaskCard(String imagePath, String title, String price,
-      String user, String details) {
+  Widget taskCard(Task task) {
     return Container(
-      width: 160,
-      margin: EdgeInsets.only(right: 15),
+      margin: const EdgeInsets.only(bottom: 20),
       decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
         color: Colors.white,
-        borderRadius: BorderRadius.circular(15),
-        boxShadow: [
-          BoxShadow(color: Colors.black12, blurRadius: 6, offset: Offset(0, 3)),
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          )
         ],
       ),
       child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          Container(
-            height: 100,
-            decoration: BoxDecoration(
-              borderRadius: BorderRadius.vertical(top: Radius.circular(15)),
-              image: DecorationImage(
-                image: AssetImage(imagePath),
-                fit: BoxFit.cover,
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image.asset(
+                  task.imagePath,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  // Add error handling here
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300], // Placeholder color
+                      height: 160,
+                      width: double.infinity,
+                      child: Center(
+                        child: Icon(
+                          Icons
+                              .image_not_supported, // Icon when image is not available
+                          color: Colors.grey[600],
+                          size: 40,
+                        ),
+                      ),
+                    );
+                  },
+                ),
               ),
-            ),
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    task.category,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today,
+                          color: Colors.white, size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        task.timeAgo,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
           ),
           Padding(
-            padding: EdgeInsets.all(10),
+            padding: const EdgeInsets.all(12),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(title, style: TextStyle(fontWeight: FontWeight.bold)),
-                SizedBox(height: 5),
-                Text(price, style: TextStyle(color: Colors.black54)),
-                SizedBox(height: 5),
-                Row(
-                  children: [
-                    Icon(Icons.person, size: 14, color: Colors.black54),
-                    SizedBox(width: 4),
-                    Expanded(
-                      child: Text(user,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.black54)),
-                    ),
-                  ],
+                Text(
+                  task.title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
                 ),
-                SizedBox(height: 4),
+                const SizedBox(height: 6),
+                Text(
+                  task.description,
+                  style: const TextStyle(color: Colors.black87, fontSize: 13),
+                ),
+                const SizedBox(height: 10),
                 Row(
                   children: [
-                    Icon(Icons.business, size: 14, color: Colors.black54),
-                    SizedBox(width: 4),
-                    Expanded(
-                      child: Text(details,
-                          style:
-                              TextStyle(fontSize: 12, color: Colors.black54)),
+                    const Icon(Icons.location_on, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      task.location,
+                      style:
+                          const TextStyle(fontSize: 13, color: Colors.black54),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        task.price,
+                        style: const TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold),
+                      ),
                     ),
                   ],
                 ),
               ],
             ),
-          ),
+          )
         ],
       ),
     );
