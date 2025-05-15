@@ -15,7 +15,7 @@ class _SeekerMainScreenState extends State<ProviderMainScreen> {
   int _selectedIndex = 0;
 
   final List<Widget> _pages = [
-    HomePage(),
+    TpHomeScreen(),
     ChatScreen(),
     PostTaskPage(),
     ProfileSettingsPage(),

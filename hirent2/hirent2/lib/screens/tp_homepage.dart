@@ -1,66 +1,117 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
-  const HomePage({super.key});
+class TpHomeScreen extends StatelessWidget {
+  const TpHomeScreen({super.key});
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.all(20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              const SizedBox(height: 20),
-              const Text(
-                'HIRÉNT',
-                style: TextStyle(
-                  fontSize: 32,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.deepPurple,
-                ),
-              ),
-              const SizedBox(height: 10),
-              const Text(
-                'Find help for your everyday tasks easily and quickly.',
-                style: TextStyle(
-                  fontSize: 16,
-                  color: Colors.black87,
-                ),
-              ),
-              const SizedBox(height: 30),
-              Expanded(
-                child: GridView.count(
-                  crossAxisCount: 2,
-                  crossAxisSpacing: 20,
-                  mainAxisSpacing: 20,
-                  children: const [
-                    TaskCard(icon: Icons.fastfood, label: 'Food Delivery'),
-                    TaskCard(icon: Icons.grass, label: 'Gardening'),
-                    TaskCard(icon: Icons.plumbing, label: 'Plumbing'),
-                    TaskCard(icon: Icons.menu_book, label: 'Assignment Help'),
-                    TaskCard(icon: Icons.pets, label: 'Pet Walk'),
-                    TaskCard(icon: Icons.more_horiz, label: 'More Tasks'),
-                  ],
-                ),
-              ),
-            ],
-          ),
+      appBar: AppBar(
+        title: const Text('Find Task Seekers'),
+        backgroundColor: Colors.white,
+        elevation: 0,
+        titleTextStyle: const TextStyle(
+          fontSize: 22,
+          fontWeight: FontWeight.bold,
+          color: Colors.black,
         ),
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.settings, color: Colors.black),
+            onPressed: () {},
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          const Padding(
+            padding: EdgeInsets.all(16.0),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: 'Search for task seekers...',
+                prefixIcon: Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.all(Radius.circular(12)),
+                ),
+              ),
+            ),
+          ),
+          SizedBox(
+            height: 40,
+            child: ListView(
+              scrollDirection: Axis.horizontal,
+              padding: const EdgeInsets.symmetric(horizontal: 16),
+              children: [
+                _buildFilterChip('All'),
+                _buildFilterChip('Cleaning'),
+                _buildFilterChip('Babysitting'),
+                _buildFilterChip('Gardening'),
+                _buildFilterChip('Cooking'),
+                _buildFilterChip('Pet Care'),
+                _buildFilterChip('Tutoring'),
+              ],
+            ),
+          ),
+          const SizedBox(height: 10),
+          Expanded(
+            child: ListView(
+              children: const [
+                TaskSeekerCard(
+                  name: 'Arjun Kumar',
+                  location: 'Mumbai, Maharashtra',
+                  skills: ['Cleaning', 'Gardening', 'Pet Care'],
+                  tasksCompleted: 15,
+                  rating: 4.8,
+                ),
+                TaskSeekerCard(
+                  name: 'Needhi Sharma',
+                  location: 'Delhi, NCR',
+                  skills: ['Tutoring', 'Shopping', 'Delivery'],
+                  tasksCompleted: 8,
+                  rating: 4.5,
+                ),
+                TaskSeekerCard(
+                  name: 'Rahul Verma',
+                  location: 'Bangalore, Karnataka',
+                  skills: ['Babysitting', 'Cooking', 'Cleaning'],
+                  tasksCompleted: 23,
+                  rating: 4.9,
+                ),
+                TaskSeekerCard(
+                  name: 'Neha Patel',
+                  location: 'Pune, Maharashtra',
+                  skills: ['Gardening', 'Assembly', 'Moving'],
+                  tasksCompleted: 11,
+                  rating: 4.7,
+                ),
+                TaskSeekerCard(
+                  name: 'Vikram Singh',
+                  location: 'Hyderabad, Telangana',
+                  skills: ['Pet Care', 'Delivery', 'Laundry'],
+                  tasksCompleted: 9,
+                  rating: 4.3,
+                ),
+              ],
+            ),
+          ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
+        currentIndex: 0,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(Icons.task_alt),
-            label: 'Your Tasks',
+            icon: Icon(Icons.task),
+            label: 'My Tasks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Chat',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.person),
@@ -70,44 +121,100 @@ class HomePage extends StatelessWidget {
       ),
     );
   }
+
+  Widget _buildFilterChip(String label) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 6),
+      child: Chip(
+        label: Text(label),
+        backgroundColor: Colors.grey[200],
+        labelStyle: const TextStyle(color: Colors.black),
+      ),
+    );
+  }
 }
 
-class TaskCard extends StatelessWidget {
-  final IconData icon;
-  final String label;
+class TaskSeekerCard extends StatelessWidget {
+  final String name;
+  final String location;
+  final List<String> skills;
+  final int tasksCompleted;
+  final double rating;
 
-  const TaskCard({super.key, required this.icon, required this.label});
+  const TaskSeekerCard({
+    super.key,
+    required this.name,
+    required this.location,
+    required this.skills,
+    required this.tasksCompleted,
+    required this.rating,
+  });
 
   @override
   Widget build(BuildContext context) {
-    return Container(
-      decoration: BoxDecoration(
-        color: Colors.grey,
-        borderRadius: BorderRadius.circular(20),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.grey.withOpacity(0.3),
-            spreadRadius: 2,
-            blurRadius: 7,
-            offset: const Offset(0, 3),
-          ),
-        ],
-      ),
-      child: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          Icon(icon, size: 40, color: Colors.deepPurple),
-          const SizedBox(height: 10),
-          Text(
-            label,
-            style: const TextStyle(
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+    return Card(
+      elevation: 2,
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+      child: ListTile(
+        leading: CircleAvatar(
+          child: Text(name.split(' ')[0][0]),
+        ),
+        title: Text(name),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            Text(location),
+            Wrap(
+              spacing: 6,
+              children: skills
+                  .map((skill) => Chip(
+                        label: Text(skill),
+                        labelStyle: const TextStyle(color: Colors.white),
+                        backgroundColor: _getSkillColor(skill),
+                      ))
+                  .toList(),
             ),
-            textAlign: TextAlign.center,
-          ),
-        ],
+            Text('$tasksCompleted tasks completed'),
+          ],
+        ),
+        trailing: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            const Icon(Icons.star, color: Colors.amber, size: 20),
+            Text(rating.toString()),
+          ],
+        ),
       ),
     );
+  }
+
+  Color _getSkillColor(String skill) {
+    switch (skill) {
+      case 'Cleaning':
+        return Colors.blue;
+      case 'Gardening':
+        return Colors.green;
+      case 'Pet Care':
+        return Colors.purple;
+      case 'Tutoring':
+        return Colors.indigo;
+      case 'Shopping':
+        return Colors.teal;
+      case 'Delivery':
+        return Colors.orange;
+      case 'Babysitting':
+        return Colors.pink;
+      case 'Cooking':
+        return Colors.deepOrange;
+      case 'Assembly':
+        return Colors.deepPurpleAccent;
+      case 'Moving':
+        return Colors.lightBlue;
+      case 'Laundry':
+        return Colors.cyan;
+      default:
+        return Colors.grey;
+    }
   }
 }
