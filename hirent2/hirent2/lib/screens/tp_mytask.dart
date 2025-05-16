@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/create_task.dart';
 
 class MyTasksScreen extends StatelessWidget {
   const MyTasksScreen({super.key});
@@ -24,7 +25,13 @@ class MyTasksScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: ElevatedButton.icon(
-              onPressed: () {},
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                      builder: (context) => const CreateTaskScreen()),
+                );
+              },
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text("Create Task"),
               style: ElevatedButton.styleFrom(
@@ -62,7 +69,7 @@ class MyTasksScreen extends StatelessWidget {
                         'This is a cleaning task that needs to be done. The task involves helping with cleaning services.',
                     location: 'San Francisco, CA',
                     category: 'Cleaning',
-                    imageUrl: '', // URL removed
+                    imageUrl: '',
                     price: '₹50',
                     daysAgo: 1,
                   ),
@@ -72,7 +79,7 @@ class MyTasksScreen extends StatelessWidget {
                         'This is a babysitting task that needs to be done. The task involves helping with babysitting services.',
                     location: 'Los Angeles, CA',
                     category: 'Babysitting',
-                    imageUrl: '', // URL removed
+                    imageUrl: '',
                     price: '₹70',
                     daysAgo: 2,
                   ),

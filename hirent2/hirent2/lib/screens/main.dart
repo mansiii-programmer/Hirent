@@ -12,7 +12,7 @@ import 'package:hirent2/screens/splash_screen.dart';
 import 'package:hirent2/screens/role_selection.dart';
 import 'package:hirent2/screens/tp_homepage.dart';
 import 'package:hirent2/screens/ts_profile_screen.dart';
-
+import 'package:hirent2/screens/create_task.dart';
 import 'package:hirent2/screens/settings.dart';
 import 'package:hirent2/screens/wallet.dart';
 import 'package:hirent2/screens/security.dart';
@@ -84,6 +84,8 @@ class HirentApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => ChatScreen());
           case '/tp_messages':
             return MaterialPageRoute(builder: (_) => ChatPage());
+          case '/createTask':
+            return MaterialPageRoute(builder: (_) => CreateTaskScreen());
 
           default:
             return MaterialPageRoute(builder: (_) => SplashScreen());
