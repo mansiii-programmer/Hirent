@@ -87,7 +87,7 @@ class YourTasksPage extends StatelessWidget {
             timeAgo: "1 day ago",
             price: "₹16",
             imageUrl:
-                "https://images.unsplash.com/photo-1581579185169-fdcfb0b7d1a9",
+                "https://images.pexels.com/photos/4107285/pexels-photo-4107285.jpeg",
             color: Colors.blue,
           ),
           buildTaskCard(
@@ -98,7 +98,8 @@ class YourTasksPage extends StatelessWidget {
             location: "New York, NY",
             timeAgo: "4 days ago",
             price: "₹50",
-            imageUrl: "https://invalid.url/image.png", // to test fallback
+            imageUrl:
+                "https://images.pexels.com/photos/3662667/pexels-photo-3662667.jpeg", // to test fallback
             color: Colors.pink,
           ),
         ],

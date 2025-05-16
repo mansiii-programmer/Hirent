@@ -10,6 +10,12 @@ class MyTasksScreen extends StatelessWidget {
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () {
+            Navigator.pop(context); // Navigate back to previous screen
+          },
+        ),
         title: const Text(
           'My Tasks',
           style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
@@ -21,7 +27,7 @@ class MyTasksScreen extends StatelessWidget {
               onPressed: () {},
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text("Create Task"),
-              style: ElevatedButton.styleFrom( 
+              style: ElevatedButton.styleFrom(
                 backgroundColor: Colors.deepPurpleAccent,
               ),
             ),
@@ -161,7 +167,8 @@ class TaskCard extends StatelessWidget {
           Stack(
             children: [
               ClipRRect(
-                borderRadius: const BorderRadius.vertical(top: Radius.circular(10)),
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(10)),
                 child: Image.network(
                   imageUrl,
                   height: 160,
@@ -173,7 +180,8 @@ class TaskCard extends StatelessWidget {
                 top: 8,
                 left: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: category == 'Cleaning'
                         ? Colors.blue
@@ -192,7 +200,8 @@ class TaskCard extends StatelessWidget {
                 top: 8,
                 right: 8,
                 child: Container(
-                  padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
                   decoration: BoxDecoration(
                     color: Colors.black.withOpacity(0.7),
                     borderRadius: BorderRadius.circular(20),
@@ -221,19 +230,18 @@ class TaskCard extends StatelessWidget {
                 const SizedBox(height: 8),
                 Row(
                   children: [
-                    const Icon(Icons.location_on,
-                        color: Colors.grey, size: 16),
+                    const Icon(Icons.location_on, color: Colors.grey, size: 16),
                     const SizedBox(width: 4),
                     Text(location,
-                        style: const TextStyle(color: Colors.grey, fontSize: 13))
+                        style:
+                            const TextStyle(color: Colors.grey, fontSize: 13))
                   ],
                 )
               ],
             ),
           ),
           Padding(
-            padding:
-                const EdgeInsets.only(right: 12, bottom: 10),
+            padding: const EdgeInsets.only(right: 12, bottom: 10),
             child: Align(
               alignment: Alignment.centerRight,
               child: Container(

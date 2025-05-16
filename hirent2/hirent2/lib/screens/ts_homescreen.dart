@@ -73,6 +73,21 @@ class _TsHomePageState extends State<TsHomePage> {
     ),
   ];
 
+  int _selectedIndex = 0;
+
+  void _onTabTapped(int index) {
+    if (index == 1) {
+      Navigator.pushNamed(context, '/ts_yourtasks');
+    } else if (index == 2) {
+      Navigator.pushNamed(context, '/ts_messages');
+    } else if (index == 3) {
+      Navigator.pushNamed(context, '/ts_profile');
+    }
+    setState(() {
+      _selectedIndex = index;
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Task> filteredTasks = selectedCategory == "All"
@@ -113,8 +128,7 @@ class _TsHomePageState extends State<TsHomePage> {
                           style: TextStyle(
                             fontSize: 26,
                             fontWeight: FontWeight.w800,
-                            color: Colors
-                                .white, // Keep white for gradient to apply
+                            color: Colors.white,
                             letterSpacing: 1.2,
                           ),
                         ),
@@ -125,7 +139,7 @@ class _TsHomePageState extends State<TsHomePage> {
                         padding: const EdgeInsets.symmetric(
                             horizontal: 10, vertical: 4),
                         decoration: BoxDecoration(
-                          color: Color(0xFFF3ECFF), // Light purple background
+                          color: const Color(0xFFF3ECFF),
                           borderRadius: BorderRadius.circular(20),
                         ),
                         child: const Text(
@@ -186,8 +200,7 @@ class _TsHomePageState extends State<TsHomePage> {
                           setState(() => selectedCategory = category);
                         },
                         selectedColor: Colors.white,
-                        backgroundColor: const Color(
-                            0xFFF0EEE9), // Light grey like your screenshot
+                        backgroundColor: const Color(0xFFF0EEE9),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(10),
                         ),
@@ -209,6 +222,31 @@ class _TsHomePageState extends State<TsHomePage> {
             ],
           ),
         ),
+      ),
+      bottomNavigationBar: BottomNavigationBar(
+        backgroundColor: Colors.white,
+        selectedItemColor: Colors.purple,
+        unselectedItemColor: Colors.grey,
+        currentIndex: _selectedIndex,
+        onTap: _onTabTapped,
+        items: const [
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.task),
+            label: 'My Tasks',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.chat),
+            label: 'Messages',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
       ),
     );
   }
@@ -239,16 +277,14 @@ class _TsHomePageState extends State<TsHomePage> {
                   height: 160,
                   width: double.infinity,
                   fit: BoxFit.cover,
-                  // Add error handling here
                   errorBuilder: (context, error, stackTrace) {
                     return Container(
-                      color: Colors.grey[300], // Placeholder color
+                      color: Colors.grey[300],
                       height: 160,
                       width: double.infinity,
                       child: Center(
                         child: Icon(
-                          Icons
-                              .image_not_supported, // Icon when image is not available
+                          Icons.image_not_supported,
                           color: Colors.grey[600],
                           size: 40,
                         ),

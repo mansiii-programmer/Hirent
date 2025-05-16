@@ -1,7 +1,28 @@
 import 'package:flutter/material.dart';
 
-class TpHomeScreen extends StatelessWidget {
+class TpHomeScreen extends StatefulWidget {
   const TpHomeScreen({super.key});
+
+  @override
+  State<TpHomeScreen> createState() => _TpHomeScreenState();
+}
+
+class _TpHomeScreenState extends State<TpHomeScreen> {
+  int _currentIndex = 0;
+
+  void _onTabTapped(int index) {
+    if (index == 1) {
+      Navigator.pushNamed(context, '/tp_yourtasks');
+    } else if (index == 2) {
+      Navigator.pushNamed(context, '/tp_messages');
+    } else if (index == 3) {
+      Navigator.pushNamed(context, '/tp_profile');
+    }
+
+    setState(() {
+      _currentIndex = index;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -99,7 +120,8 @@ class TpHomeScreen extends StatelessWidget {
       bottomNavigationBar: BottomNavigationBar(
         selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
-        currentIndex: 0,
+        currentIndex: _currentIndex,
+        onTap: _onTabTapped,
         items: const [
           BottomNavigationBarItem(
             icon: Icon(Icons.home),
@@ -107,7 +129,7 @@ class TpHomeScreen extends StatelessWidget {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.task),
-            label: 'My Tasks',
+            label: 'Create Task',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),

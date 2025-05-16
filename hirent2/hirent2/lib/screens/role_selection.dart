@@ -30,7 +30,8 @@ class RoleSelectionPage extends StatelessWidget {
               children: [
                 /// HIRENT logo with gradient
                 ShaderMask(
-                  shaderCallback: (bounds) => titleGradient.createShader(bounds),
+                  shaderCallback: (bounds) =>
+                      titleGradient.createShader(bounds),
                   child: const Text(
                     'HIRENT',
                     style: TextStyle(
@@ -75,8 +76,10 @@ class RoleSelectionPage extends StatelessWidget {
                   },
                   child: _OptionCard(
                     title: 'Find Tasks',
-                    description: 'Browse available gigs and earn money in your free time',
-                    footerText: 'Perfect for students, part-timers, and freelancers',
+                    description:
+                        'Browse available gigs and earn money in your free time',
+                    footerText:
+                        'Perfect for students, part-timers, and freelancers',
                     backgroundColor: Color(0xFFFCFCFA),
                   ),
                 ),
@@ -90,8 +93,10 @@ class RoleSelectionPage extends StatelessWidget {
                   },
                   child: _OptionCard(
                     title: 'Post Tasks',
-                    description: 'Find skilled people to help with your tasks and projects',
-                    footerText: 'Hire local talent for home, office or business needs',
+                    description:
+                        'Find skilled people to help with your tasks and projects',
+                    footerText:
+                        'Hire local talent for home, office or business needs',
                     backgroundColor: Color(0xFFFBFBF8),
                   ),
                 ),
@@ -144,7 +149,8 @@ class _OptionCard extends StatefulWidget {
   State<_OptionCard> createState() => _OptionCardState();
 }
 
-class _OptionCardState extends State<_OptionCard> with SingleTickerProviderStateMixin {
+class _OptionCardState extends State<_OptionCard>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _opacityAnimation;
   late Animation<double> _scaleAnimation;

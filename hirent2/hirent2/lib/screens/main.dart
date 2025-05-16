@@ -2,12 +2,22 @@ import 'package:flutter/material.dart';
 import 'package:hirent2/screens/otp_screen.dart';
 import 'package:hirent2/screens/sign_in_screen.dart';
 import 'package:hirent2/screens/signup_screen.dart';
-import 'package:hirent2/screens/profile_screen.dart';
+import 'package:hirent2/screens/tp_profile_screen.dart';
+import 'package:hirent2/screens/tp_chatting.dart';
+import 'package:hirent2/screens/tp_mytask.dart';
+import 'package:hirent2/screens/ts_chatting_screen.dart';
+import 'package:hirent2/screens/ts_homescreen.dart';
 import 'package:hirent2/screens/your_tasks.dart' as tasks;
 import 'package:hirent2/screens/splash_screen.dart';
 import 'package:hirent2/screens/role_selection.dart';
-import 'package:hirent2/screens/seeker_main_screen.dart';
-import 'package:hirent2/screens/provider_main_screen.dart';
+import 'package:hirent2/screens/tp_homepage.dart';
+import 'package:hirent2/screens/ts_profile_screen.dart';
+
+// ✅ NEW IMPORTS
+import 'package:hirent2/screens/settings.dart';
+import 'package:hirent2/screens/wallet.dart';
+import 'package:hirent2/screens/security.dart';
+import 'package:hirent2/screens/payment_history.dart';
 
 void main() {
   runApp(const HirentApp());
@@ -26,25 +36,59 @@ class HirentApp extends StatelessWidget {
         primaryColor: const Color(0xFFD8B4F8),
       ),
       home: const SplashScreen(),
-      routes: {
-        '/signin': (context) => SignInPage(),
-        '/signup': (context) => SignUpScreen(),
-        '/otp': (context) => const OTPVerificationPage(),
+      onGenerateRoute: (settings) {
+        if (settings.name == '/otp') {
+          final args = settings.arguments as Map<String, dynamic>?;
+          return MaterialPageRoute(
+            builder: (context) => OTPVerificationPage(),
+            settings: RouteSettings(arguments: args),
+          );
+        }
 
-        // Main screens
-        '/seekerMain': (context) => const SeekerMainScreen(),
-        '/providerMain': (context) => const ProviderMainScreen(),
+        switch (settings.name) {
+          case '/signin':
+            return MaterialPageRoute(builder: (_) => SignInPage());
+          case '/signup':
+            return MaterialPageRoute(
+                builder: (_) => SignUpScreen(selectedRole: ''));
+          case '/seekerMain':
+            return MaterialPageRoute(builder: (_) => TsHomePage());
+          case '/providerMain':
+            return MaterialPageRoute(builder: (_) => TpHomeScreen());
+          case '/ts_profile':
+            return MaterialPageRoute(builder: (_) => TSProfileSettingsPage());
+          case '/tp_profile':
+            return MaterialPageRoute(builder: (_) => TPProfileSettingsPage());
+          case '/ts_yourtasks':
+            return MaterialPageRoute(builder: (_) => tasks.YourTasksPage());
+          case '/tp_yourtasks':
+            return MaterialPageRoute(builder: (_) => MyTasksScreen());
+          case '/role':
+            return MaterialPageRoute(builder: (_) => RoleSelectionPage());
+          case '/seekerLogin':
+            return MaterialPageRoute(
+                builder: (_) => SignUpScreen(selectedRole: ''));
+          case '/providerLogin':
+            return MaterialPageRoute(
+                builder: (_) => SignUpScreen(selectedRole: ''));
 
-        // Common screens
-        '/profile': (context) => const ProfileSettingsPage(),
-        '/yourtasks': (context) => const tasks.YourTasksPage(),
+          // ✅ NEW ROUTES
+          case '/settings':
+            return MaterialPageRoute(builder: (_) => SettingsPage());
+          case '/wallet':
+            return MaterialPageRoute(builder: (_) => WalletPage());
+          case '/security':
+            return MaterialPageRoute(builder: (_) => SecurityPage());
+          case '/paymentHistory':
+            return MaterialPageRoute(builder: (_) => PaymentHistoryPage());
+          case '/ts_messages':
+            return MaterialPageRoute(builder: (_) => ChatScreen());
+          case '/tp_messages':
+            return MaterialPageRoute(builder: (_) => ChatPage());
 
-        // ✅ Fixed: no parameters passed here
-        '/role': (context) => const RoleSelectionPage(),
-
-        // Login routes
-        '/seekerLogin': (context) => SignUpScreen(),
-        '/providerLogin': (context) => SignUpScreen(),
+          default:
+            return MaterialPageRoute(builder: (_) => SplashScreen());
+        }
       },
     );
   }

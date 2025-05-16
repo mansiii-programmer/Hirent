@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
 
-class ProfileSettingsPage extends StatelessWidget {
-  const ProfileSettingsPage({super.key});
+class TPProfileSettingsPage extends StatelessWidget {
+  const TPProfileSettingsPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -33,19 +33,29 @@ class ProfileSettingsPage extends StatelessWidget {
                       CircleAvatar(
                         radius: 28,
                         backgroundColor: Colors.white,
-                        child: Icon(Icons.person_outline, color: Colors.teal, size: 30),
+                        child: Icon(Icons.person_outline,
+                            color: Colors.teal, size: 30),
                       ),
                       SizedBox(width: 12),
                       Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text("Mansiiii", style: TextStyle(color: Colors.white, fontSize: 18, fontWeight: FontWeight.bold)),
-                          Text("mansi.awasthi222@gmail.com", style: TextStyle(color: Colors.white, fontSize: 14)),
+                          Text("Mansiiii",
+                              style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold)),
+                          Text("mansi.awasthi222@gmail.com",
+                              style:
+                                  TextStyle(color: Colors.white, fontSize: 14)),
                           Row(
                             children: [
-                              Icon(Icons.location_on, color: Colors.white, size: 14),
+                              Icon(Icons.location_on,
+                                  color: Colors.white, size: 14),
                               SizedBox(width: 4),
-                              Text("Mumbai, Maharashtra", style: TextStyle(color: Colors.white, fontSize: 12)),
+                              Text("Mumbai, Maharashtra",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 12)),
                             ],
                           ),
                         ],
@@ -67,12 +77,32 @@ class ProfileSettingsPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 16),
-            const _ProfileItem(icon: LucideIcons.checkSquare, title: "Your Tasks"),
-            const _ProfileItem(icon: LucideIcons.messageCircle, title: "Messages"),
-            const _ProfileItem(icon: LucideIcons.creditCard, title: "Payment History"),
-            const _ProfileItem(icon: LucideIcons.wallet, title: "Wallet"),
-            const _ProfileItem(icon: LucideIcons.shieldCheck, title: "Security"),
-            const _ProfileItem(icon: LucideIcons.settings, title: "Settings"),
+
+            // List of Profile Items with Routes
+            const _ProfileItem(
+                icon: LucideIcons.checkSquare,
+                title: "Create tasks",
+                routeName: '/tp_yourtasks'),
+            const _ProfileItem(
+                icon: LucideIcons.messageCircle,
+                title: "Messages",
+                routeName: '/tp_messages'),
+            const _ProfileItem(
+                icon: LucideIcons.creditCard,
+                title: "Payment History",
+                routeName: '/paymentHistory'),
+            const _ProfileItem(
+                icon: LucideIcons.wallet,
+                title: "Wallet",
+                routeName: '/wallet'),
+            const _ProfileItem(
+                icon: LucideIcons.shieldCheck,
+                title: "Security",
+                routeName: '/security'),
+            const _ProfileItem(
+                icon: LucideIcons.settings,
+                title: "Settings",
+                routeName: '/settings'),
           ],
         ),
       ),
@@ -90,9 +120,14 @@ class _ProfileStat extends StatelessWidget {
   Widget build(BuildContext context) {
     return Column(
       children: [
-        Text(count, style: const TextStyle(color: Colors.white, fontSize: 16, fontWeight: FontWeight.bold)),
+        Text(count,
+            style: const TextStyle(
+                color: Colors.white,
+                fontSize: 16,
+                fontWeight: FontWeight.bold)),
         const SizedBox(height: 2),
-        Text(label, style: const TextStyle(color: Colors.white70, fontSize: 12)),
+        Text(label,
+            style: const TextStyle(color: Colors.white70, fontSize: 12)),
       ],
     );
   }
@@ -101,8 +136,13 @@ class _ProfileStat extends StatelessWidget {
 class _ProfileItem extends StatelessWidget {
   final IconData icon;
   final String title;
+  final String routeName;
 
-  const _ProfileItem({required this.icon, required this.title});
+  const _ProfileItem({
+    required this.icon,
+    required this.title,
+    required this.routeName,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -114,8 +154,13 @@ class _ProfileItem extends StatelessWidget {
       child: ListTile(
         leading: Icon(icon, color: const Color(0xFF0E807A)),
         title: Text(title),
-        trailing: const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
-        onTap: () {}, // Handle tap if needed
+        trailing:
+            const Icon(Icons.arrow_forward_ios, size: 16, color: Colors.grey),
+        onTap: () {
+          if (routeName.isNotEmpty) {
+            Navigator.pushNamed(context, routeName);
+          }
+        },
       ),
     );
   }

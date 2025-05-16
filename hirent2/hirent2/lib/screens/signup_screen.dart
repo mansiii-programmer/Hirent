@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/home_screen.dart';
 import 'package:hirent2/screens/otp_screen.dart';
 import 'package:hirent2/screens/sign_in_screen.dart';
 
@@ -14,9 +13,10 @@ class HirentApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: const SignUpScreen(),
+      home: const SignUpScreen(
+        selectedRole: '',
+      ),
       routes: {
-        '/homescreen': (context) => const HomeScreen(isCurrentlySeeker: true),
         '/signin': (context) => const SignInPage(),
         '/otp': (context) => const OTPVerificationPage(),
       },
@@ -25,7 +25,7 @@ class HirentApp extends StatelessWidget {
 }
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key});
+  const SignUpScreen({super.key, required String selectedRole});
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -39,11 +39,26 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _confirmPasswordController =
       TextEditingController();
 
-  bool isSeeker = true;
+  bool? isSeeker; // Nullable bool to force explicit role selection
 
   void _continue() {
+    if (isSeeker == null) {
+      // Show snackbar or alert to select role
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Please select a role')),
+      );
+      print('Continue pressed but role not selected');
+      return;
+    }
+
     if (_formKey.currentState!.validate()) {
-      Navigator.pushNamed(context, '/otp');
+      String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
+      print('Continue pressed, selected role: $selectedRole');
+      Navigator.pushNamed(
+        context,
+        '/otp',
+        arguments: {'role': selectedRole},
+      );
     }
   }
 
@@ -143,12 +158,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.teal,
+                    backgroundColor:
+                        isSeeker == null ? Colors.grey : Colors.teal,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10)),
                   ),
-                  onPressed: _continue,
+                  onPressed: isSeeker == null ? null : _continue,
                   child: const Text(
                     "Sign up",
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -192,60 +208,61 @@ class _SignUpScreenState extends State<SignUpScreen> {
   }
 
   Widget _roleOption(String title, String description, bool seekerOption) {
-  bool selected = isSeeker == seekerOption;
-  return SizedBox(
-    width: (MediaQuery.of(context).size.width - 70) / 2,
-    child: GestureDetector(
-      onTap: () {
-        setState(() {
-          isSeeker = seekerOption;
-        });
-      },
-      child: Container(
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          color: selected ? Colors.teal.shade50 : Colors.white,
-          border: Border.all(
-            color: selected ? Colors.teal : Colors.grey.shade300,
+    bool selected = isSeeker == seekerOption;
+    return SizedBox(
+      width: (MediaQuery.of(context).size.width - 70) / 2,
+      child: GestureDetector(
+        onTap: () {
+          setState(() {
+            isSeeker = seekerOption;
+            print('Role changed by tap: isSeeker = $isSeeker');
+          });
+        },
+        child: Container(
+          padding: const EdgeInsets.all(12),
+          decoration: BoxDecoration(
+            color: selected ? Colors.teal.shade50 : Colors.white,
+            border: Border.all(
+              color: selected ? Colors.teal : Colors.grey.shade300,
+            ),
+            borderRadius: BorderRadius.circular(12),
           ),
-          borderRadius: BorderRadius.circular(12),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Row(
-              children: [
-                Radio<bool>(
-                  value: seekerOption,
-                  groupValue: isSeeker,
-                  onChanged: (val) => setState(() {
-                    isSeeker = val!;
-                  }),
-                  activeColor: Colors.teal,
-                ),
-                Flexible(
-                  child: Text(
-                    title,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 14,
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              Row(
+                children: [
+                  Radio<bool>(
+                    value: seekerOption,
+                    groupValue: isSeeker,
+                    onChanged: (val) => setState(() {
+                      isSeeker = val!;
+                      print('Role changed by radio: isSeeker = $isSeeker');
+                    }),
+                    activeColor: Colors.teal,
+                  ),
+                  Flexible(
+                    child: Text(
+                      title,
+                      style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
                     ),
                   ),
-                ),
-              ],
-            ),
-            const SizedBox(height: 4),
-            Text(
-              description,
-              style: const TextStyle(fontSize: 12, color: Colors.black54),
-            ),
-          ],
+                ],
+              ),
+              const SizedBox(height: 4),
+              Text(
+                description,
+                style: const TextStyle(fontSize: 12, color: Colors.black54),
+              ),
+            ],
+          ),
         ),
       ),
-    ),
-  );
-}
-
+    );
+  }
 
   Widget _buildInputField({
     required TextEditingController controller,

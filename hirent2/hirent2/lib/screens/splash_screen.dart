@@ -1,7 +1,6 @@
 import 'dart:math';
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/role_selection.dart';
-import 'package:hirent2/screens/home_screen.dart'; // Adjust your path
+import 'package:hirent2/screens/role_selection.dart'; // Adjust your path
 
 class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
@@ -49,12 +48,6 @@ class _SplashScreenState extends State<SplashScreen>
   Future<void> _navigateNext() async {
     bool isLoggedIn = await checkLoginStatus();
     if (isLoggedIn) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(
-          builder: (context) => HomeScreen(isCurrentlySeeker: false),
-        ),
-      );
     } else {
       Navigator.pushReplacement(
         context,
@@ -120,8 +113,8 @@ class _SplashScreenState extends State<SplashScreen>
                             Color(0xffF17C44),
                             Color(0xffAE5EC1),
                           ],
-                        ).createShader(Rect.fromLTWH(
-                            -100, -100, bounds.width + 300, bounds.height + 300));
+                        ).createShader(Rect.fromLTWH(-100, -100,
+                            bounds.width + 300, bounds.height + 300));
                       },
                       child: const Text(
                         "HIRENT",

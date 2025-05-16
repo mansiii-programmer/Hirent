@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/seeker_main_screen.dart';
-import 'package:hirent2/screens/provider_main_screen.dart';
+import 'package:hirent2/screens/ts_homescreen.dart';
+import 'package:hirent2/screens/tp_homepage.dart';
+import 'package:hirent2/screens/signup_screen.dart'; // import this if in a different file
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -40,12 +41,12 @@ class _SignInPageState extends State<SignInPage> {
       if (_selectedRole == 'Task Seeker') {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => SeekerMainScreen()),
+          MaterialPageRoute(builder: (context) => TsHomePage()),
         );
       } else {
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => ProviderMainScreen()),
+          MaterialPageRoute(builder: (context) => TpHomeScreen()),
         );
       }
     } else {
@@ -171,10 +172,8 @@ class _SignInPageState extends State<SignInPage> {
                     style: TextStyle(color: Colors.grey),
                   ),
                   const SizedBox(height: 30),
-
                   _buildRoleSelector(),
                   const SizedBox(height: 25),
-
                   TextFormField(
                     controller: _emailController,
                     validator: _validateEmail,
@@ -185,10 +184,13 @@ class _SignInPageState extends State<SignInPage> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     validator: _validatePassword,
-                    decoration: _inputDecoration('Enter your password').copyWith(
+                    decoration:
+                        _inputDecoration('Enter your password').copyWith(
                       suffixIcon: IconButton(
                         icon: Icon(
-                          _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                          _obscurePassword
+                              ? Icons.visibility_off
+                              : Icons.visibility,
                           color: Colors.grey,
                         ),
                         onPressed: () {
@@ -252,7 +254,13 @@ class _SignInPageState extends State<SignInPage> {
                     width: double.infinity,
                     child: OutlinedButton(
                       onPressed: () {
-                        // Navigate to SignUp screen
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) =>
+                                SignUpScreen(selectedRole: _selectedRole),
+                          ),
+                        );
                       },
                       style: OutlinedButton.styleFrom(
                         padding: const EdgeInsets.symmetric(vertical: 14),
