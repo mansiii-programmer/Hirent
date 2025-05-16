@@ -1,31 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:hirent2/screens/otp_screen.dart';
-import 'package:hirent2/screens/sign_in_screen.dart';
-
-void main() {
-  runApp(const HirentApp());
-}
-
-class HirentApp extends StatelessWidget {
-  const HirentApp({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      home: const SignUpScreen(
-        selectedRole: '',
-      ),
-      routes: {
-        '/signin': (context) => const SignInPage(),
-        '/otp': (context) => const OTPVerificationPage(),
-      },
-    );
-  }
-}
 
 class SignUpScreen extends StatefulWidget {
-  const SignUpScreen({super.key, required String selectedRole});
+  const SignUpScreen({super.key, required this.selectedRole});
+
+  final String selectedRole;
 
   @override
   State<SignUpScreen> createState() => _SignUpScreenState();
@@ -33,58 +11,70 @@ class SignUpScreen extends StatefulWidget {
 
 class _SignUpScreenState extends State<SignUpScreen> {
   final _formKey = GlobalKey<FormState>();
+
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final TextEditingController _confirmPasswordController =
       TextEditingController();
+  final TextEditingController _bioController = TextEditingController();
+  final TextEditingController _skillsController = TextEditingController();
+  final TextEditingController _locationController = TextEditingController();
 
-  bool? isSeeker; // Nullable bool to force explicit role selection
+  bool? isSeeker;
+
+  @override
+  void initState() {
+    super.initState();
+    // Set initial role based on passed selectedRole
+    if (widget.selectedRole.toLowerCase().contains("seeker")) {
+      isSeeker = true;
+    } else if (widget.selectedRole.toLowerCase().contains("provider")) {
+      isSeeker = false;
+    }
+  }
 
   void _continue() {
     if (isSeeker == null) {
-      // Show snackbar or alert to select role
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a role')),
       );
-      print('Continue pressed but role not selected');
       return;
     }
 
     if (_formKey.currentState!.validate()) {
       String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
-      print('Continue pressed, selected role: $selectedRole');
       Navigator.pushNamed(
         context,
         '/otp',
-        arguments: {'role': selectedRole},
+        arguments: {
+          'role': selectedRole,
+          'email': _emailController.text.trim(),
+          'name': _nameController.text.trim(),
+          'location': _locationController.text.trim(),
+          'bio': _bioController.text.trim(),
+          'skills': _skillsController.text.trim(),
+        },
       );
     }
   }
 
   String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Required*';
-    } else if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$')
-        .hasMatch(value.trim())) {
+    if (value == null || value.isEmpty) return 'Required*';
+    if (!RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w]{2,4}$').hasMatch(value.trim())) {
       return 'Enter a valid email';
     }
     return null;
   }
 
   String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Required*';
-    } else if (value.length < 6) {
-      return 'Password must be at least 6 characters';
-    }
+    if (value == null || value.isEmpty) return 'Required*';
+    if (value.length < 6) return 'Password must be at least 6 characters';
     return null;
   }
 
   String? _validateConfirmPassword(String? value) {
-    if (value != _passwordController.text) {
-      return 'Passwords do not match';
-    }
+    if (value != _passwordController.text) return 'Passwords do not match';
     return null;
   }
 
@@ -103,9 +93,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Text(
                   "HIRENT",
                   style: TextStyle(
-                      fontSize: 24,
-                      fontWeight: FontWeight.bold,
-                      color: Colors.teal),
+                    fontSize: 24,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.teal,
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -130,30 +121,58 @@ class _SignUpScreenState extends State<SignUpScreen> {
               ),
               const SizedBox(height: 20),
               _buildInputField(
-                  controller: _nameController,
-                  label: "Full Name",
-                  hint: "Your full name"),
+                controller: _nameController,
+                label: "Full Name",
+                hint: "Your full name",
+              ),
               const SizedBox(height: 15),
               _buildInputField(
-                  controller: _emailController,
-                  label: "Email address",
-                  hint: "you@example.com",
-                  validator: _validateEmail),
+                controller: _emailController,
+                label: "Email address",
+                hint: "you@example.com",
+                validator: _validateEmail,
+              ),
               const SizedBox(height: 15),
               _buildInputField(
-                  controller: _passwordController,
-                  label: "Password",
-                  hint: "Enter your password",
-                  obscureText: true,
-                  validator: _validatePassword),
+                controller: _passwordController,
+                label: "Password",
+                hint: "Enter your password",
+                obscureText: true,
+                validator: _validatePassword,
+              ),
               const SizedBox(height: 15),
               _buildInputField(
-                  controller: _confirmPasswordController,
-                  label: "Confirm Password",
-                  hint: "Re-enter password",
-                  obscureText: true,
-                  validator: _validateConfirmPassword),
-              const SizedBox(height: 20),
+                controller: _confirmPasswordController,
+                label: "Confirm Password",
+                hint: "Re-enter password",
+                obscureText: true,
+                validator: _validateConfirmPassword,
+              ),
+              const SizedBox(height: 15),
+              _buildInputField(
+                controller: _locationController,
+                label: "Location",
+                hint: "Enter your city or area",
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Location is required'
+                    : null,
+              ),
+              const SizedBox(height: 15),
+              if (isSeeker == true) ...[
+                _buildInputField(
+                  controller: _skillsController,
+                  label: "Skills",
+                  hint: "e.g., Cooking, Teaching, Delivery",
+                ),
+                const SizedBox(height: 15),
+                _buildInputField(
+                  controller: _bioController,
+                  label: "Short Bio",
+                  hint: "Tell something about yourself",
+                  maxLines: 3,
+                ),
+                const SizedBox(height: 15),
+              ],
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -162,7 +181,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                         isSeeker == null ? Colors.grey : Colors.teal,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10)),
+                      borderRadius: BorderRadius.circular(10),
+                    ),
                   ),
                   onPressed: isSeeker == null ? null : _continue,
                   child: const Text(
@@ -215,7 +235,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
         onTap: () {
           setState(() {
             isSeeker = seekerOption;
-            print('Role changed by tap: isSeeker = $isSeeker');
           });
         },
         child: Container(
@@ -237,7 +256,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     groupValue: isSeeker,
                     onChanged: (val) => setState(() {
                       isSeeker = val!;
-                      print('Role changed by radio: isSeeker = $isSeeker');
                     }),
                     activeColor: Colors.teal,
                   ),
@@ -270,6 +288,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     required String hint,
     bool obscureText = false,
     String? Function(String?)? validator,
+    int maxLines = 1,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -279,6 +298,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
         TextFormField(
           controller: controller,
           obscureText: obscureText,
+          maxLines: maxLines,
           validator: validator,
           decoration: InputDecoration(
             hintText: hint,

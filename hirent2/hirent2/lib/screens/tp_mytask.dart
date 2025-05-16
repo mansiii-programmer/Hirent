@@ -62,8 +62,7 @@ class MyTasksScreen extends StatelessWidget {
                         'This is a cleaning task that needs to be done. The task involves helping with cleaning services.',
                     location: 'San Francisco, CA',
                     category: 'Cleaning',
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1581578017427-63a755159f4c',
+                    imageUrl: '', // URL removed
                     price: '₹50',
                     daysAgo: 1,
                   ),
@@ -73,8 +72,7 @@ class MyTasksScreen extends StatelessWidget {
                         'This is a babysitting task that needs to be done. The task involves helping with babysitting services.',
                     location: 'Los Angeles, CA',
                     category: 'Babysitting',
-                    imageUrl:
-                        'https://images.unsplash.com/photo-1583912268184-0666b8d8e8a7',
+                    imageUrl: '', // URL removed
                     price: '₹70',
                     daysAgo: 2,
                   ),
@@ -169,12 +167,27 @@ class TaskCard extends StatelessWidget {
               ClipRRect(
                 borderRadius:
                     const BorderRadius.vertical(top: Radius.circular(10)),
-                child: Image.network(
-                  imageUrl,
-                  height: 160,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                ),
+                child: imageUrl.isNotEmpty
+                    ? Image.network(
+                        imageUrl,
+                        height: 160,
+                        width: double.infinity,
+                        fit: BoxFit.cover,
+                      )
+                    : Container(
+                        height: 160,
+                        width: double.infinity,
+                        decoration: BoxDecoration(
+                          color: Colors.grey[300],
+                          borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(10)),
+                        ),
+                        child: const Icon(
+                          Icons.image_not_supported,
+                          size: 60,
+                          color: Colors.grey,
+                        ),
+                      ),
               ),
               Positioned(
                 top: 8,
