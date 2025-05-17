@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key, required this.selectedRole});
@@ -34,13 +36,44 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void _continue() {
-    if (isSeeker == null) {
+void _continue() async {
+  if (isSeeker == null) {
+    ScaffoldMessenger.of(context).showSnackBar(
+      const SnackBar(content: Text('Please select a role')),
+    );
+    return;
+  }
+
+  if (_formKey.currentState!.validate()) {
+    String email = _emailController.text.trim();
+
+    // Send OTP
+    final response = await http.post(
+      Uri.parse("http://127.0.0.1:8000/otp/send"),
+      headers: {"Content-Type": "application/json"},
+      body: jsonEncode({"email": email}),
+    );
+
+    if (response.statusCode == 200) {
+      // Navigate to OTP page with signup data
+      String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
+
+      Navigator.pushNamed(context, '/otp', arguments: {
+        'role': selectedRole,
+        'email': email,
+        'username': _nameController.text.trim(),
+        'password': _passwordController.text,
+        'location': _locationController.text.trim(),
+        'bio': _bioController.text.trim(),
+        'skills': _skillsController.text.trim(),
+      });
+    } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please select a role')),
+        SnackBar(content: Text("Failed to send OTP")),
       );
-      return;
     }
+  }
+}
 
     if (_formKey.currentState!.validate()) {
       String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';

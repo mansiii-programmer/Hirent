@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class OTPVerificationPage extends StatefulWidget {
   const OTPVerificationPage({super.key});
@@ -112,20 +114,66 @@ class _OTPVerificationPageState extends State<OTPVerificationPage> {
                       width: double.infinity,
                       height: 50,
                       child: ElevatedButton(
-                        onPressed: () {
-                          if (otp.length == 6) {
-                            if (role == 'Task Provider') {
-                              Navigator.pushReplacementNamed(
-                                  context, '/providerMain');
-                            } else {
-                              Navigator.pushReplacementNamed(
-                                  context, '/seekerMain');
-                            }
-                          } else {
+                        onPressed: () async {
+                          if (otp.length != 6) {
                             ScaffoldMessenger.of(context).showSnackBar(
                               const SnackBar(
                                 content: Text('Please enter a 6-digit code.'),
                               ),
+                            );
+                            return;
+                          }
+
+                          final email = args?['email'];
+                          final username = args?['username'];
+                          final password = args?['password'];
+                          final location = args?['location'];
+                          final bio = args?['bio'];
+                          final skills = args?['skills'];
+
+                          // Step 1: Verify OTP
+                          final verifyResponse = await http.post(
+                            Uri.parse("http://127.0.0.1:8000/otp/verify"),
+                            headers: {"Content-Type": "application/json"},
+                            body: jsonEncode({"email": email, "otp": otp}),
+                          );
+
+                          if (verifyResponse.statusCode != 200) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text(
+                                      "Invalid or expired OTP. Please try again.")),
+                            );
+                            return;
+                          }
+
+                          // Step 2: Create account
+                          final signupResponse = await http.post(
+                            Uri.parse("http://127.0.0.1:8000/auth/signup"),
+                            headers: {"Content-Type": "application/json"},
+                            body: jsonEncode({
+                              "username": username,
+                              "email": email,
+                              "password": password,
+                              "role": role,
+                              "location": location,
+                              "phone": "0000000000", // Placeholder for now
+                              "bio": bio,
+                              "profile_picture": "",
+                            }),
+                          );
+
+                          if (signupResponse.statusCode == 201) {
+                            Navigator.pushReplacementNamed(
+                              context,
+                              role == 'Task Provider'
+                                  ? '/providerMain'
+                                  : '/seekerMain',
+                            );
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                  content: Text("Signup failed. Please try again.")),
                             );
                           }
                         },
