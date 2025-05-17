@@ -4,7 +4,6 @@ import 'dart:convert';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key, required this.selectedRole});
-
   final String selectedRole;
 
   @override
@@ -17,8 +16,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController =
-      TextEditingController();
+  final TextEditingController _confirmPasswordController = TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -28,7 +26,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     super.initState();
-    // Set initial role based on passed selectedRole
     if (widget.selectedRole.toLowerCase().contains("seeker")) {
       isSeeker = true;
     } else if (widget.selectedRole.toLowerCase().contains("provider")) {
@@ -36,59 +33,49 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-void _continue() async {
-  if (isSeeker == null) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      const SnackBar(content: Text('Please select a role')),
-    );
-    return;
-  }
-
-  if (_formKey.currentState!.validate()) {
-    String email = _emailController.text.trim();
-
-    // Send OTP
-    final response = await http.post(
-      Uri.parse("http://127.0.0.1:8000/otp/send"),
-      headers: {"Content-Type": "application/json"},
-      body: jsonEncode({"email": email}),
-    );
-
-    if (response.statusCode == 200) {
-      // Navigate to OTP page with signup data
-      String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
-
-      Navigator.pushNamed(context, '/otp', arguments: {
-        'role': selectedRole,
-        'email': email,
-        'username': _nameController.text.trim(),
-        'password': _passwordController.text,
-        'location': _locationController.text.trim(),
-        'bio': _bioController.text.trim(),
-        'skills': _skillsController.text.trim(),
-      });
-    } else {
+  Future<void> _continue() async {
+    if (isSeeker == null) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Failed to send OTP")),
+        const SnackBar(content: Text('Please select a role')),
       );
+      return;
     }
-  }
-}
 
     if (_formKey.currentState!.validate()) {
-      String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
-      Navigator.pushNamed(
-        context,
-        '/otp',
-        arguments: {
-          'role': selectedRole,
-          'email': _emailController.text.trim(),
-          'name': _nameController.text.trim(),
-          'location': _locationController.text.trim(),
-          'bio': _bioController.text.trim(),
-          'skills': _skillsController.text.trim(),
-        },
-      );
+      String email = _emailController.text.trim();
+
+      try {
+        final response = await http.post(
+          Uri.parse("http://127.0.0.1:8000/otp/otp/send"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({"email": email}),
+        );
+
+        print('OTP Response: ${response.statusCode}, ${response.body}');
+
+        if (response.statusCode == 200) {
+          String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
+
+          Navigator.pushNamed(context, '/otp', arguments: {
+            'role': selectedRole,
+            'email': email,
+            'username': _nameController.text.trim(),
+            'password': _passwordController.text,
+            'location': _locationController.text.trim(),
+            'bio': _bioController.text.trim(),
+            'skills': _skillsController.text.trim(),
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to send OTP")),
+          );
+        }
+      } catch (e) {
+        print("Error sending OTP: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Network error: $e")),
+        );
+      }
     }
   }
 
@@ -125,11 +112,7 @@ void _continue() async {
               const Center(
                 child: Text(
                   "HIRENT",
-                  style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.teal,
-                  ),
+                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal),
                 ),
               ),
               const SizedBox(height: 10),
@@ -146,10 +129,8 @@ void _continue() async {
                 spacing: 10,
                 runSpacing: 10,
                 children: [
-                  _roleOption("Task Seeker",
-                      "Find and complete tasks to earn money", true),
-                  _roleOption("Task Provider",
-                      "Post tasks and hire skilled individuals", false),
+                  _roleOption("Task Seeker", "Find and complete tasks to earn money", true),
+                  _roleOption("Task Provider", "Post tasks and hire skilled individuals", false),
                 ],
               ),
               const SizedBox(height: 20),
@@ -186,9 +167,7 @@ void _continue() async {
                 controller: _locationController,
                 label: "Location",
                 hint: "Enter your city or area",
-                validator: (value) => value == null || value.isEmpty
-                    ? 'Location is required'
-                    : null,
+                validator: (value) => value == null || value.isEmpty ? 'Location is required' : null,
               ),
               const SizedBox(height: 15),
               if (isSeeker == true) ...[
@@ -210,8 +189,7 @@ void _continue() async {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor:
-                        isSeeker == null ? Colors.grey : Colors.teal,
+                    backgroundColor: isSeeker == null ? Colors.grey : Colors.teal,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -240,8 +218,7 @@ void _continue() async {
                 child: OutlinedButton(
                   onPressed: () => Navigator.pushNamed(context, '/signin'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 40, vertical: 14),
+                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
                     side: const BorderSide(color: Colors.grey),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -274,9 +251,7 @@ void _continue() async {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: selected ? Colors.teal.shade50 : Colors.white,
-            border: Border.all(
-              color: selected ? Colors.teal : Colors.grey.shade300,
-            ),
+            border: Border.all(color: selected ? Colors.teal : Colors.grey.shade300),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -295,10 +270,7 @@ void _continue() async {
                   Flexible(
                     child: Text(
                       title,
-                      style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
                 ],

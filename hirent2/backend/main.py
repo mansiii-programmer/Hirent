@@ -1,6 +1,9 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from routers.user_routes import user_router
+from dotenv import load_dotenv
+load_dotenv()  # call this as early as possible
+
 
 # Routers
 from auth.routes import router as auth_router
@@ -12,11 +15,19 @@ from routers.changepassword.routes import router as changepassword_router
 
 # Initialize app
 app = FastAPI()
+origins = [
+    "http://localhost",
+    "http://127.0.0.1",
+    "http://10.0.2.2",            # android emulator proxy
+    "http://192.168.1.10",        # replace with your laptop IP
+    "http://192.168.1.10:8000",   # with port if needed
+    # add other origins as required
+]
 
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # In production, restrict this to frontend domain
+   allow_origins=origins,  # In production, restrict this to frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

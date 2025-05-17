@@ -39,17 +39,17 @@ class HirentApp extends StatelessWidget {
         if (settings.name == '/otp') {
           final args = settings.arguments as Map<String, dynamic>?;
           return MaterialPageRoute(
-            builder: (context) => OTPVerificationPage(),
+            builder: (context) => OTPVerificationPage(signUpData: args ?? {}),
             settings: RouteSettings(arguments: args),
           );
         }
 
         switch (settings.name) {
           case '/signin':
-            return MaterialPageRoute(builder: (_) => SignInPage());
+            return MaterialPageRoute(builder: (_) => const SignInPage());
           case '/signup':
             return MaterialPageRoute(
-                builder: (_) => SignUpScreen(selectedRole: ''));
+                builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/seekerMain':
             return MaterialPageRoute(builder: (_) => TsHomePage());
           case '/providerMain':
@@ -66,12 +66,10 @@ class HirentApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => RoleSelectionPage());
           case '/seekerLogin':
             return MaterialPageRoute(
-                builder: (_) => SignUpScreen(selectedRole: ''));
+                builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/providerLogin':
             return MaterialPageRoute(
-                builder: (_) => SignUpScreen(selectedRole: ''));
-
-          // ✅ NEW ROUTES
+                builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/settings':
             return MaterialPageRoute(builder: (_) => SettingsPage());
           case '/wallet':
@@ -86,9 +84,8 @@ class HirentApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => ChatPage());
           case '/createTask':
             return MaterialPageRoute(builder: (_) => CreateTaskScreen());
-
           default:
-            return MaterialPageRoute(builder: (_) => SplashScreen());
+            return MaterialPageRoute(builder: (_) => const SplashScreen());
         }
       },
     );

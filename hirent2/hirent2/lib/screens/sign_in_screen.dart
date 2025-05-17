@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:hirent2/screens/ts_homescreen.dart';
 import 'package:hirent2/screens/tp_homepage.dart';
-import 'package:hirent2/screens/signup_screen.dart'; // import this if in a different file
+import 'package:hirent2/screens/signup_screen.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -36,17 +39,49 @@ class _SignInPageState extends State<SignInPage> {
     return null;
   }
 
-  void _validateForm() {
+  Future<void> _validateForm() async {
     if (_formKey.currentState!.validate()) {
-      if (_selectedRole == 'Task Seeker') {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => TsHomePage()),
+      final email = _emailController.text.trim();
+      final password = _passwordController.text.trim();
+
+      try {
+        final response = await http.post(
+          Uri.parse('http://127.0.0.1:8000/auth/login'),
+          headers: {'Content-Type': 'application/json'},
+          body: jsonEncode({'email': email, 'password': password}),
         );
-      } else {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => TpHomeScreen()),
+
+        if (response.statusCode == 200) {
+          final data = jsonDecode(response.body);
+          final token = data['access_token'];
+
+          // optional: store token using shared_preferences if needed
+          final _prefs = await SharedPreferences.getInstance();
+          await _prefs.setString("token", token);
+
+          print(_prefs.get("token"));
+
+          if (_selectedRole == 'Task Seeker') {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => TsHomePage()),
+            );
+          } else {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => TpHomeScreen()),
+            );
+          }
+        } else {
+          final error = jsonDecode(response.body);
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(error['detail'] ?? 'Login failed')),
+          );
+        }
+      } catch (e) {
+        print(e);
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Network error. Try again.")),
         );
       }
     } else {

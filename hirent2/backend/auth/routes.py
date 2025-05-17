@@ -9,7 +9,7 @@ from .utils import create_token
 router = APIRouter()
 
 @router.post("/signup", status_code=201)
-def signup(user: UserSignup):
+async def signup(user: UserSignup):
     if users_collection.find_one({"email": user.email}):
         raise HTTPException(status_code=400, detail="Email already registered")
 
@@ -27,12 +27,12 @@ def signup(user: UserSignup):
         "created_at": datetime.utcnow().isoformat()
     }
 
-    users_collection.insert_one(new_user)
+    await users_collection.insert_one(new_user)
     return {"message": "User created successfully"}
 
 @router.post("/login", response_model=TokenResponse)
-def login(user: UserLogin):
-    db_user = users_collection.find_one({"email": user.email})
+async def login(user: UserLogin):
+    db_user = await users_collection.find_one({"email": user.email})
     if not db_user or not verify_pw(user.password, db_user["password_hash"]):
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
