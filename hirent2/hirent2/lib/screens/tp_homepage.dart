@@ -36,12 +36,12 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
           fontWeight: FontWeight.bold,
           color: Colors.black,
         ),
-        actions: [
+        /***actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
             onPressed: () {},
           ),
-        ],
+        ],***/
       ),
       body: Column(
         children: [
