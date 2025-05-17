@@ -14,6 +14,7 @@ dependencies:
   cupertino_icons: ^1.0.8
   pin_code_fields: ^8.0.0
   intl: ^0.17.0
+  http: ^0.13.5 
 
   # For UPI payment (you can use a plugin or custom integration)
   upi_payment: ^0.0.1
