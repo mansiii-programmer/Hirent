@@ -43,21 +43,55 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Find Task Seekers'),
         backgroundColor: Colors.white,
         elevation: 0,
-        titleTextStyle: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [
+                  Color(0xFF8E2DE2),
+                  Color.fromARGB(255, 196, 167, 211),
+                  Color.fromARGB(255, 137, 85, 164)
+                ],
+              ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+              child: const Text(
+                'HIRENT',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3ECFF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Task Provider',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
         ),
         actions: [
           IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
+            icon: Icon(Icons.settings, color: Colors.grey[700]),
             onPressed: () {
-              Navigator.pushNamed(context, '/settings');
+              // Add settings action here
             },
-          ),
+          )
         ],
       ),
       body: Column(
@@ -66,7 +100,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
             padding: EdgeInsets.all(16.0),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search for task seekers...',
+                hintText: 'Search for task providers...',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
