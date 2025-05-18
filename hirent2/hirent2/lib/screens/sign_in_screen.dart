@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/ts_homescreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-import 'package:hirent2/screens/ts_homescreen.dart';
-import 'package:hirent2/screens/tp_homepage.dart';
-import 'package:hirent2/screens/signup_screen.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+
+import 'tp_homepage.dart';
+import 'ts_homescreen.dart';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -15,85 +15,103 @@ class SignInPage extends StatefulWidget {
 
 class _SignInPageState extends State<SignInPage> {
   final _formKey = GlobalKey<FormState>();
-  final TextEditingController _emailController = TextEditingController();
-  final TextEditingController _passwordController = TextEditingController();
-  bool _obscurePassword = true;
-  String _selectedRole = 'Task Seeker';
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _roleController = TextEditingController();
 
-  String? _validateEmail(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Required*';
-    } else if (!RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$').hasMatch(value)) {
+  bool _obscurePassword = true;
+
+  String? _validateEmail(String? val) {
+    if (val == null || val.isEmpty) return 'Required*';
+    if (!RegExp(r'^[a-zA-Z0-9._%+-]+@gmail\.com$').hasMatch(val)) {
       return 'Enter a valid @gmail.com email';
     }
     return null;
   }
 
-  String? _validatePassword(String? value) {
-    if (value == null || value.isEmpty) {
-      return 'Required*';
-    } else if (!RegExp(r'^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$')
-        .hasMatch(value)) {
+  String? _validatePassword(String? val) {
+    if (val == null || val.isEmpty) return 'Required*';
+    if (!RegExp(r'^(?=.*[a-zA-Z])(?=.*\d)[A-Za-z\d]{6,}$').hasMatch(val)) {
       return 'Password must be at least 6 characters & alphanumeric';
     }
     return null;
   }
 
-  Future<void> _validateForm() async {
-    if (_formKey.currentState!.validate()) {
-      final email = _emailController.text.trim();
-      final password = _passwordController.text.trim();
+  String? _validateRole(String? val) {
+    if (val == null || val.isEmpty) return 'Required*';
+    final role = val.toLowerCase().trim();
+    if (role != 'seeker' && role != 'provider') {
+      return 'Role must be seeker or provider';
+    }
+    return null;
+  }
 
-      try {
-        final response = await http.post(
-          Uri.parse('http://127.0.0.1:8000/auth/login'),
-          headers: {'Content-Type': 'application/json'},
-          body: jsonEncode({'email': email, 'password': password}),
-        );
+  Future<void> _submit() async {
+    if (!_formKey.currentState!.validate()) return;
 
-        if (response.statusCode == 200) {
-          final data = jsonDecode(response.body);
-          final token = data['access_token'];
+    final email = _emailController.text.trim();
+    final password = _passwordController.text.trim();
+    final enteredRole = _roleController.text.trim().toLowerCase();
 
-          // optional: store token using shared_preferences if needed
-          final _prefs = await SharedPreferences.getInstance();
-          await _prefs.setString("token", token);
+    try {
+      // Replace your backend url here. For emulator, use 10.0.2.2 instead of localhost.
+      final url = Uri.parse('http://127.0.0.1:8000/auth/login');
 
-          print(_prefs.get("token"));
+      final response = await http.post(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'email': email, 'password': password,'role':enteredRole}),
+      );
 
-          if (_selectedRole == 'Task Seeker') {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => TsHomePage()),
-            );
-          } else {
-            Navigator.pushReplacement(
-              context,
-              MaterialPageRoute(builder: (context) => TpHomeScreen()),
-            );
-          }
-        } else {
-          final error = jsonDecode(response.body);
+      if (response.statusCode == 200) {
+        final data = jsonDecode(response.body);
+        final token = data['access_token'];
+        final user = data['user'];
+        final backendRole = user['role'].toString().toLowerCase();
+
+        print('Backend role: $backendRole');
+        print('Entered role: $enteredRole');
+
+        if (enteredRole != backendRole) {
           ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(content: Text(error['detail'] ?? 'Login failed')),
+            const SnackBar(content: Text("Role does not match our records")),
+          );
+          return;
+        }
+
+        // Navigate based on role
+        if (backendRole == 'seeker') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const TsHomePage()),
+          );
+        } else if (backendRole == 'provider') {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => const TpHomeScreen()),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Unknown role received")),
           );
         }
-      } catch (e) {
-        print(e);
+      } else {
+        final error = jsonDecode(response.body);
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text("Network error. Try again.")),
+          SnackBar(content: Text(error['detail'] ?? 'Login failed')),
         );
       }
-    } else {
+    } catch (e) {
+      print('Login error: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Please fill in all fields correctly")),
+        const SnackBar(content: Text("Network error. Try again.")),
       );
     }
   }
 
-  InputDecoration _inputDecoration(String hintText) {
+  InputDecoration _inputDecoration(String hint) {
     return InputDecoration(
-      hintText: hintText,
+      hintText: hint,
       filled: true,
       fillColor: Colors.grey[200],
       border: OutlineInputBorder(
@@ -101,75 +119,6 @@ class _SignInPageState extends State<SignInPage> {
         borderSide: BorderSide.none,
       ),
       contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-    );
-  }
-
-  Widget _buildRoleSelector() {
-    return Column(
-      children: [
-        _buildRoleOption('Task Seeker', 'Find and complete tasks'),
-        const SizedBox(height: 12),
-        _buildRoleOption('Task Provider', 'Post tasks and hire'),
-      ],
-    );
-  }
-
-  Widget _buildRoleOption(String role, String subtitle) {
-    final isSelected = _selectedRole == role;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          _selectedRole = role;
-        });
-      },
-      child: Container(
-        width: double.infinity,
-        padding: const EdgeInsets.all(12),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(12),
-          border: Border.all(
-            color: isSelected ? const Color(0xFF018078) : Colors.grey.shade300,
-            width: 2,
-          ),
-        ),
-        child: Row(
-          children: [
-            Radio<String>(
-              value: role,
-              groupValue: _selectedRole,
-              onChanged: (value) {
-                setState(() {
-                  _selectedRole = value!;
-                });
-              },
-            ),
-            const SizedBox(width: 8),
-            Expanded(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Text(
-                    role,
-                    style: const TextStyle(
-                      fontWeight: FontWeight.bold,
-                      fontSize: 16,
-                      color: Colors.black,
-                    ),
-                  ),
-                  const SizedBox(height: 4),
-                  Text(
-                    subtitle,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: Colors.grey[600],
-                    ),
-                  ),
-                ],
-              ),
-            )
-          ],
-        ),
-      ),
     );
   }
 
@@ -197,30 +146,25 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                   ),
                   const SizedBox(height: 6),
-                  const Text(
-                    'Welcome back',
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.w600),
-                  ),
+                  const Text('Welcome back',
+                      style:
+                          TextStyle(fontSize: 20, fontWeight: FontWeight.w600)),
                   const SizedBox(height: 4),
-                  const Text(
-                    'Log in to your account',
-                    style: TextStyle(color: Colors.grey),
-                  ),
+                  const Text('Log in to your account',
+                      style: TextStyle(color: Colors.grey)),
                   const SizedBox(height: 30),
-                  _buildRoleSelector(),
-                  const SizedBox(height: 25),
                   TextFormField(
                     controller: _emailController,
                     validator: _validateEmail,
-                    decoration: _inputDecoration('you@example.com'),
+                    decoration: _inputDecoration('you@gmail.com'),
+                    keyboardType: TextInputType.emailAddress,
                   ),
                   const SizedBox(height: 16),
                   TextFormField(
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     validator: _validatePassword,
-                    decoration:
-                        _inputDecoration('Enter your password').copyWith(
+                    decoration: _inputDecoration('Enter your password').copyWith(
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
@@ -236,27 +180,17 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 10),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                    children: [
-                      Row(
-                        children: [
-                          Checkbox(value: false, onChanged: (_) {}),
-                          const Text("Remember me"),
-                        ],
-                      ),
-                      TextButton(
-                        onPressed: () {},
-                        child: const Text("Forgot password?"),
-                      ),
-                    ],
+                  const SizedBox(height: 16),
+                  TextFormField(
+                    controller: _roleController,
+                    validator: _validateRole,
+                    decoration: _inputDecoration('Role (seeker or provider)'),
                   ),
-                  const SizedBox(height: 10),
+                  const SizedBox(height: 20),
                   SizedBox(
                     width: double.infinity,
                     child: ElevatedButton(
-                      onPressed: _validateForm,
+                      onPressed: _submit,
                       style: ElevatedButton.styleFrom(
                         backgroundColor: const Color(0xFF018078),
                         padding: const EdgeInsets.symmetric(vertical: 16),
@@ -267,45 +201,6 @@ class _SignInPageState extends State<SignInPage> {
                       child: const Text(
                         'Log in',
                         style: TextStyle(fontSize: 16, color: Colors.white),
-                      ),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-                  Row(
-                    children: const [
-                      Expanded(child: Divider()),
-                      Padding(
-                        padding: EdgeInsets.symmetric(horizontal: 8),
-                        child: Text(
-                          "Don't have an account?",
-                          style: TextStyle(color: Colors.grey),
-                        ),
-                      ),
-                      Expanded(child: Divider()),
-                    ],
-                  ),
-                  const SizedBox(height: 16),
-                  SizedBox(
-                    width: double.infinity,
-                    child: OutlinedButton(
-                      onPressed: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) =>
-                                SignUpScreen(selectedRole: _selectedRole),
-                          ),
-                        );
-                      },
-                      style: OutlinedButton.styleFrom(
-                        padding: const EdgeInsets.symmetric(vertical: 14),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                      ),
-                      child: const Text(
-                        'Sign up',
-                        style: TextStyle(fontSize: 16),
                       ),
                     ),
                   ),

@@ -12,16 +12,31 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
 
   void _onTabTapped(int index) {
     if (index == 1) {
-      Navigator.pushNamed(context, '/tp_yourtasks');
+      // Navigate to create task page or your tasks page
+      Navigator.pushNamed(context, '/tp_yourtasks').then((_) {
+        // When coming back, reset currentIndex to 0 (Home)
+        setState(() {
+          _currentIndex = 0;
+        });
+      });
     } else if (index == 2) {
-      Navigator.pushNamed(context, '/tp_messages');
+      Navigator.pushNamed(context, '/tp_messages').then((_) {
+        setState(() {
+          _currentIndex = 0;
+        });
+      });
     } else if (index == 3) {
-      Navigator.pushNamed(context, '/tp_profile');
+      Navigator.pushNamed(context, '/tp_profile').then((_) {
+        setState(() {
+          _currentIndex = 0;
+        });
+      });
+    } else {
+      // For index 0 (home), update selected index normally
+      setState(() {
+        _currentIndex = index;
+      });
     }
-
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   @override
@@ -39,7 +54,9 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
         actions: [
           IconButton(
             icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
+            onPressed: () {
+              Navigator.pushNamed(context, '/settings');
+            },
           ),
         ],
       ),
@@ -129,7 +146,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.task),
-            label: 'Create Task',
+            label: 'My Tasks',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),

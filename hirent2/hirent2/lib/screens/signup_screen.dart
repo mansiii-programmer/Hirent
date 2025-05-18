@@ -16,7 +16,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
-  final TextEditingController _confirmPasswordController = TextEditingController();
+  final TextEditingController _confirmPasswordController =
+      TextEditingController();
   final TextEditingController _bioController = TextEditingController();
   final TextEditingController _skillsController = TextEditingController();
   final TextEditingController _locationController = TextEditingController();
@@ -46,14 +47,25 @@ class _SignUpScreenState extends State<SignUpScreen> {
 
       try {
         final response = await http.post(
-          Uri.parse("http://127.0.0.1:8000/otp/otp/send"),
+          Uri.parse("http://127.0.0.1:8000/auth/signup"),
           headers: {"Content-Type": "application/json"},
-          body: jsonEncode({"email": email}),
+          body: jsonEncode({
+            "email": _emailController.text.trim(),
+            "username": _nameController.text.trim(),
+            "password": _passwordController.text.trim(),
+            "role": isSeeker! ? "seeker" : "provider",
+            "phone": "", // You can add a phone controller if needed
+            "location": _locationController.text.trim(),
+            "profile_picture": "", // You can handle file uploads later
+            "bio": _bioController.text.trim(),
+            "skills": _skillsController.text
+                .trim(), // include this if your backend accepts it
+          }),
         );
 
-        print('OTP Response: ${response.statusCode}, ${response.body}');
+        print('signup response: ${response.statusCode}, ${response.body}');
 
-        if (response.statusCode == 200) {
+        if (response.statusCode == 201) {
           String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
 
           Navigator.pushNamed(context, '/otp', arguments: {
@@ -112,7 +124,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
               const Center(
                 child: Text(
                   "HIRENT",
-                  style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold, color: Colors.teal),
+                  style: TextStyle(
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal),
                 ),
               ),
               const SizedBox(height: 10),
@@ -129,8 +144,10 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 spacing: 10,
                 runSpacing: 10,
                 children: [
-                  _roleOption("Task Seeker", "Find and complete tasks to earn money", true),
-                  _roleOption("Task Provider", "Post tasks and hire skilled individuals", false),
+                  _roleOption("Task Seeker",
+                      "Find and complete tasks to earn money", true),
+                  _roleOption("Task Provider",
+                      "Post tasks and hire skilled individuals", false),
                 ],
               ),
               const SizedBox(height: 20),
@@ -167,7 +184,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 controller: _locationController,
                 label: "Location",
                 hint: "Enter your city or area",
-                validator: (value) => value == null || value.isEmpty ? 'Location is required' : null,
+                validator: (value) => value == null || value.isEmpty
+                    ? 'Location is required'
+                    : null,
               ),
               const SizedBox(height: 15),
               if (isSeeker == true) ...[
@@ -189,13 +208,20 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 width: double.infinity,
                 child: ElevatedButton(
                   style: ElevatedButton.styleFrom(
-                    backgroundColor: isSeeker == null ? Colors.grey : Colors.teal,
+                    backgroundColor:
+                        isSeeker == null ? Colors.grey : Colors.teal,
                     padding: const EdgeInsets.symmetric(vertical: 14),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: isSeeker == null ? null : _continue,
+                  onPressed: () async {
+                    if (isSeeker == null) {
+                      null;
+                    } else {
+                      await _continue();
+                    }
+                  },
                   child: const Text(
                     "Sign up",
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -218,7 +244,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: OutlinedButton(
                   onPressed: () => Navigator.pushNamed(context, '/signin'),
                   style: OutlinedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(horizontal: 40, vertical: 14),
+                    padding: const EdgeInsets.symmetric(
+                        horizontal: 40, vertical: 14),
                     side: const BorderSide(color: Colors.grey),
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(10),
@@ -251,7 +278,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
           padding: const EdgeInsets.all(12),
           decoration: BoxDecoration(
             color: selected ? Colors.teal.shade50 : Colors.white,
-            border: Border.all(color: selected ? Colors.teal : Colors.grey.shade300),
+            border: Border.all(
+                color: selected ? Colors.teal : Colors.grey.shade300),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -270,7 +298,8 @@ class _SignUpScreenState extends State<SignUpScreen> {
                   Flexible(
                     child: Text(
                       title,
-                      style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 14),
+                      style: const TextStyle(
+                          fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
                 ],

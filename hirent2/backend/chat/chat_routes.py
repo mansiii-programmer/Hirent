@@ -7,15 +7,15 @@ from pymongo import DESCENDING
 router = APIRouter()
 
 @router.post("/chat/send")
-async def send_message(msg: ChatMessage):
-    result = await messages_collection.insert_one(msg.dict())
+def send_message(msg: ChatMessage):
+    result = messages_collection.insert_one(msg.dict())
     if result.inserted_id:
         return {"message": "Message sent"}
     raise HTTPException(status_code=500, detail="Message sending failed")
 
 @router.get("/chat/history/{user1}/{user2}", response_model=List[ChatMessage])
-async def get_chat_history(user1: str, user2: str):
-    history = list(await messages_collection.find({
+def get_chat_history(user1: str, user2: str):
+    history = list(messages_collection.find({
         "$or": [
             {"sender": user1, "receiver": user2},
             {"sender": user2, "receiver": user1}

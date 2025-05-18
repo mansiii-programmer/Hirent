@@ -93,71 +93,71 @@ class _TsHomePageState extends State<TsHomePage> {
     final List<Task> filteredTasks = selectedCategory == "All"
         ? allTasks
         : allTasks
-            .where((task) => task.category
-                .toLowerCase()
-                .startsWith(selectedCategory.toLowerCase()))
+            .where((task) =>
+                task.category.toLowerCase() ==
+                selectedCategory.toLowerCase()) // Exact match
             .toList();
 
     return Scaffold(
       backgroundColor: Colors.grey[50],
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [
+                  Color(0xFF8E2DE2),
+                  Color.fromARGB(255, 196, 167, 211),
+                  Color.fromARGB(255, 137, 85, 164)
+                ],
+              ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+              child: const Text(
+                'HIRENT',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding:
+                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3ECFF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Task Seeker',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
+        ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.grey[700]),
+            onPressed: () {
+              // Add settings action here
+            },
+          )
+        ],
+      ),
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Header
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: [
-                  Row(
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      // Gradient HIRENT text
-                      ShaderMask(
-                        shaderCallback: (bounds) => const LinearGradient(
-                          colors: [
-                            Color(0xFF8E2DE2),
-                            Color.fromARGB(255, 196, 167, 211),
-                            Color.fromARGB(255, 137, 85, 164)
-                          ],
-                        ).createShader(
-                            Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
-                        child: const Text(
-                          'HIRENT',
-                          style: TextStyle(
-                            fontSize: 26,
-                            fontWeight: FontWeight.w800,
-                            color: Colors.white,
-                            letterSpacing: 1.2,
-                          ),
-                        ),
-                      ),
-                      const SizedBox(width: 8),
-                      // Task Seeker capsule
-                      Container(
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 10, vertical: 4),
-                        decoration: BoxDecoration(
-                          color: const Color(0xFFF3ECFF),
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        child: const Text(
-                          'Task Seeker',
-                          style: TextStyle(
-                            color: Colors.black87,
-                            fontSize: 13,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                      ),
-                    ],
-                  ),
-                  Icon(Icons.settings, color: Colors.grey[700]),
-                ],
-              ),
-              const SizedBox(height: 20),
-
               // Search Bar
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
@@ -190,8 +190,9 @@ class _TsHomePageState extends State<TsHomePage> {
                         label: Text(
                           category,
                           style: TextStyle(
-                            color:
-                                isSelected ? Colors.black87 : Colors.grey[800],
+                            color: isSelected
+                                ? Colors.black87
+                                : Colors.grey[800],
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -218,14 +219,14 @@ class _TsHomePageState extends State<TsHomePage> {
               ),
               const SizedBox(height: 16),
 
-              ...filteredTasks.map((task) => taskCard(task)).toList(),
+              ...filteredTasks.map((task) => taskCard(task)),
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
-        selectedItemColor: Colors.purple,
+        selectedItemColor: Colors.deepPurple,
         unselectedItemColor: Colors.grey,
         currentIndex: _selectedIndex,
         onTap: _onTabTapped,

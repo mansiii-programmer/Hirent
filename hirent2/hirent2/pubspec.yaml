@@ -1,7 +1,7 @@
 name: hirent2
 description: "A new Flutter project."
 
-publish_to: 'none' 
+publish_to: 'none'
 
 version: 1.0.0+1
 
@@ -15,8 +15,6 @@ dependencies:
   pin_code_fields: ^8.0.0
   intl: ^0.17.0
   http: ^0.13.5
-
-  # For UPI payment (you can use a plugin or custom integration)
   upi_payment: ^0.0.1
   lucide_icons: ^0.257.0
   shared_preferences: ^2.5.3

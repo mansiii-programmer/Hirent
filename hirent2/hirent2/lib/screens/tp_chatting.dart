@@ -34,6 +34,8 @@ class ChatPage extends StatelessWidget {
     },
   ];
 
+  ChatPage({super.key});
+
   String getTimeAgo(DateTime time) {
     final now = DateTime.now();
     final diff = now.difference(time);
