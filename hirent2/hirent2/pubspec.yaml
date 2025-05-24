@@ -13,7 +13,7 @@ dependencies:
     sdk: flutter
   cupertino_icons: ^1.0.8
   pin_code_fields: ^8.0.0
-  intl: ^0.17.0
+  intl: ^0.20.2
   http: ^0.13.5
   upi_payment: ^0.0.1
   lucide_icons: ^0.257.0

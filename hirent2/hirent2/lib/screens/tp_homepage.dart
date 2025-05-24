@@ -12,9 +12,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
 
   void _onTabTapped(int index) {
     if (index == 1) {
-      // Navigate to create task page or your tasks page
       Navigator.pushNamed(context, '/tp_yourtasks').then((_) {
-        // When coming back, reset currentIndex to 0 (Home)
         setState(() {
           _currentIndex = 0;
         });
@@ -32,7 +30,6 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
         });
       });
     } else {
-      // For index 0 (home), update selected index normally
       setState(() {
         _currentIndex = index;
       });
@@ -68,8 +65,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
             ),
             const SizedBox(width: 8),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: const Color(0xFFF3ECFF),
                 borderRadius: BorderRadius.circular(20),
@@ -85,12 +81,6 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
             ),
           ],
         ),
-        /***actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Column(
         children: [
