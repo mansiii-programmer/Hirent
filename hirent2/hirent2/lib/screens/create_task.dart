@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
+
 
 class CreateTaskScreen extends StatefulWidget {
   const CreateTaskScreen({super.key});
@@ -10,20 +13,46 @@ class CreateTaskScreen extends StatefulWidget {
 class _CreateTaskScreenState extends State<CreateTaskScreen> {
   String? selectedCategory;
   final List<String> categories = [
-    'Cleaning',
-    'Babysitting',
-    'Gardening',
-    'Cooking',
-    'Pet Care',
-    'Tutoring',
-    'Delivery',
-    'Shopping',
+    'Cleaning', 'Babysitting', 'Gardening', 'Cooking',
+    'Pet Care', 'Tutoring', 'Delivery', 'Shopping',
   ];
 
   final TextEditingController titleController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
   final TextEditingController amountController = TextEditingController();
   final TextEditingController locationController = TextEditingController();
+
+  /// Replace this with actual user ID from login/session
+  final String postedBy = "6630cafed5fc23..."; // 👈 replace with real ID
+
+  Future<void> postTask() async {
+    final url = Uri.parse("http://127.0.0.1:8000/tasks/"); // Use local IP on real devices
+
+    final response = await http.post(
+      url,
+      headers: {"Content-Type": "application/json"},
+      body: json.encode({
+        "title": titleController.text,
+        "description": descriptionController.text,
+        "category": selectedCategory,
+        "amount": amountController.text,
+        "location": locationController.text,
+        "posted_by": postedBy,
+      }),
+    );
+
+    if (response.statusCode == 200) {
+      final data = json.decode(response.body);
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Task created successfully! ID: ${data['task_id']}"))
+      );
+      Navigator.pop(context); // or navigate to another screen
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to create task"))
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,10 +75,9 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
             TextField(
               controller: titleController,
               decoration: InputDecoration(
-                hintText: 'E.g., House Cleaning, Dog Walking, etc.',
+                hintText: 'E.g., House Cleaning, Dog Walking',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                filled: true,
-                fillColor: Colors.white,
+                filled: true, fillColor: Colors.white,
               ),
             ),
             const SizedBox(height: 20),
@@ -62,10 +90,11 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               decoration: InputDecoration(
                 hintText: "Select a category",
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                filled: true,
-                fillColor: Colors.white,
+                filled: true, fillColor: Colors.white,
               ),
-              items: categories.map((cat) => DropdownMenuItem(value: cat, child: Text(cat))).toList(),
+              items: categories.map((cat) =>
+                DropdownMenuItem(value: cat, child: Text(cat))
+              ).toList(),
             ),
             const SizedBox(height: 20),
 
@@ -77,8 +106,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               decoration: InputDecoration(
                 hintText: 'Describe the task in detail...',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                filled: true,
-                fillColor: Colors.white,
+                filled: true, fillColor: Colors.white,
               ),
             ),
             const SizedBox(height: 20),
@@ -91,8 +119,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               decoration: InputDecoration(
                 hintText: '0.00',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                filled: true,
-                fillColor: Colors.white,
+                filled: true, fillColor: Colors.white,
               ),
             ),
             const SizedBox(height: 20),
@@ -104,8 +131,7 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               decoration: InputDecoration(
                 hintText: 'City, State',
                 border: OutlineInputBorder(borderRadius: BorderRadius.circular(10)),
-                filled: true,
-                fillColor: Colors.white,
+                filled: true, fillColor: Colors.white,
               ),
             ),
             const SizedBox(height: 30),
@@ -114,12 +140,23 @@ class _CreateTaskScreenState extends State<CreateTaskScreen> {
               width: double.infinity,
               height: 50,
               child: ElevatedButton(
-                onPressed: () {},
+                onPressed: () {
+                  if (titleController.text.isNotEmpty &&
+                      selectedCategory != null &&
+                      descriptionController.text.isNotEmpty &&
+                      amountController.text.isNotEmpty &&
+                      locationController.text.isNotEmpty) {
+                    postTask();
+                  } else {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text("Please fill all fields")));
+                  }
+                },
                 style: ElevatedButton.styleFrom(
                   padding: EdgeInsets.zero,
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
-                  elevation: 0,
                   backgroundColor: Colors.transparent,
+                  elevation: 0,
                 ),
                 child: Ink(
                   decoration: BoxDecoration(

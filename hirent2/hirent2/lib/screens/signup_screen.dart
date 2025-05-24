@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class SignUpScreen extends StatefulWidget {
   const SignUpScreen({super.key, required this.selectedRole});
-
   final String selectedRole;
 
   @override
@@ -26,7 +27,6 @@ class _SignUpScreenState extends State<SignUpScreen> {
   @override
   void initState() {
     super.initState();
-    // Set initial role based on passed selectedRole
     if (widget.selectedRole.toLowerCase().contains("seeker")) {
       isSeeker = true;
     } else if (widget.selectedRole.toLowerCase().contains("provider")) {
@@ -34,7 +34,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
   }
 
-  void _continue() {
+  Future<void> _continue() async {
     if (isSeeker == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please select a role')),
@@ -43,19 +43,51 @@ class _SignUpScreenState extends State<SignUpScreen> {
     }
 
     if (_formKey.currentState!.validate()) {
-      String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
-      Navigator.pushNamed(
-        context,
-        '/otp',
-        arguments: {
-          'role': selectedRole,
-          'email': _emailController.text.trim(),
-          'name': _nameController.text.trim(),
-          'location': _locationController.text.trim(),
-          'bio': _bioController.text.trim(),
-          'skills': _skillsController.text.trim(),
-        },
-      );
+      String email = _emailController.text.trim();
+
+      try {
+        final response = await http.post(
+          Uri.parse("http://127.0.0.1:8000/auth/signup"),
+          headers: {"Content-Type": "application/json"},
+          body: jsonEncode({
+            "email": _emailController.text.trim(),
+            "username": _nameController.text.trim(),
+            "password": _passwordController.text.trim(),
+            "role": isSeeker! ? "seeker" : "provider",
+            "phone": "", // You can add a phone controller if needed
+            "location": _locationController.text.trim(),
+            "profile_picture": "", // You can handle file uploads later
+            "bio": _bioController.text.trim(),
+            "skills": _skillsController.text
+                .trim(), // include this if your backend accepts it
+          }),
+        );
+
+        print('signup response: ${response.statusCode}, ${response.body}');
+
+        if (response.statusCode == 201) {
+          String selectedRole = isSeeker! ? 'Task Seeker' : 'Task Provider';
+
+          Navigator.pushNamed(context, '/otp', arguments: {
+            'role': selectedRole,
+            'email': email,
+            'username': _nameController.text.trim(),
+            'password': _passwordController.text,
+            'location': _locationController.text.trim(),
+            'bio': _bioController.text.trim(),
+            'skills': _skillsController.text.trim(),
+          });
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text("Failed to send OTP")),
+          );
+        }
+      } catch (e) {
+        print("Error sending OTP: $e");
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Network error: $e")),
+        );
+      }
     }
   }
 
@@ -93,10 +125,9 @@ class _SignUpScreenState extends State<SignUpScreen> {
                 child: Text(
                   "HIRENT",
                   style: TextStyle(
-                    fontSize: 24,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.teal,
-                  ),
+                      fontSize: 24,
+                      fontWeight: FontWeight.bold,
+                      color: Colors.teal),
                 ),
               ),
               const SizedBox(height: 10),
@@ -184,7 +215,13 @@ class _SignUpScreenState extends State<SignUpScreen> {
                       borderRadius: BorderRadius.circular(10),
                     ),
                   ),
-                  onPressed: isSeeker == null ? null : _continue,
+                  onPressed: () async {
+                    if (isSeeker == null) {
+                      null;
+                    } else {
+                      await _continue();
+                    }
+                  },
                   child: const Text(
                     "Sign up",
                     style: TextStyle(color: Colors.white, fontSize: 16),
@@ -242,8 +279,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
           decoration: BoxDecoration(
             color: selected ? Colors.teal.shade50 : Colors.white,
             border: Border.all(
-              color: selected ? Colors.teal : Colors.grey.shade300,
-            ),
+                color: selected ? Colors.teal : Colors.grey.shade300),
             borderRadius: BorderRadius.circular(12),
           ),
           child: Column(
@@ -263,9 +299,7 @@ class _SignUpScreenState extends State<SignUpScreen> {
                     child: Text(
                       title,
                       style: const TextStyle(
-                        fontWeight: FontWeight.bold,
-                        fontSize: 14,
-                      ),
+                          fontWeight: FontWeight.bold, fontSize: 14),
                     ),
                   ),
                 ],

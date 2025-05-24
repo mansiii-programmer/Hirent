@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class RoleSelectionPage extends StatelessWidget {
-  const RoleSelectionPage({Key? key}) : super(key: key);
+  const RoleSelectionPage({super.key});
 
   @override
   Widget build(BuildContext context) {
@@ -250,7 +250,7 @@ class TapScaleContainer extends StatefulWidget {
   final Widget child;
   final VoidCallback onTap;
 
-  const TapScaleContainer({required this.child, required this.onTap});
+  const TapScaleContainer({super.key, required this.child, required this.onTap});
 
   @override
   State<TapScaleContainer> createState() => _TapScaleContainerState();

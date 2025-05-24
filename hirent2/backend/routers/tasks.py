@@ -1,37 +1,45 @@
-from fastapi import APIRouter
+from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from database.connection import tasks_collection
+from bson import ObjectId
 
 router = APIRouter()
 
-# Task model
+# ---------------- Task Model ---------------- #
 class Task(BaseModel):
     title: str
     description: Optional[str]
     category: str
     posted_by: Optional[str] = None
     assigned_to: Optional[str] = None
+    amount: Optional[str] = None
+    location: Optional[str] = None
 
-# Static task categories
+# ---------------- Categories ---------------- #
 TASK_CATEGORIES = [
-    "Food Delivery", "Gardening", "Plumbing",
-    "Assignment Help", "Pet Walk", "More Tasks"
+    "Cleaning", "Babysitting", "Gardening", "Cooking",
+    "Pet Care", "Tutoring", "Delivery", "Shopping"
 ]
 
 @router.get("/categories")
 def get_categories():
-    """Return predefined task categories for frontend grid."""
+    """Return predefined task categories for frontend dropdown."""
     return {"categories": TASK_CATEGORIES}
 
+# ---------------- Create Task ---------------- #
 @router.post("/")
 def create_task(task: Task):
-    """Create a new task. Auth is disabled for now."""
+    """Create a new task (for posting from mobile)."""
     if not task.posted_by:
-        task.posted_by = "test-user-id"
+        task.posted_by = "test-user-id"  # Optional fallback
     result = tasks_collection.insert_one(task.dict())
-    return {"message": "Task created", "task_id": str(result.inserted_id)}
+    return {
+        "message": "Task created successfully",
+        "task_id": str(result.inserted_id)
+    }
 
+# ---------------- List All Tasks ---------------- #
 @router.get("/")
 def list_tasks():
     """Return all tasks from the database."""
