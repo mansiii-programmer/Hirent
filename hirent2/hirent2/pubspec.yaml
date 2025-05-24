@@ -17,7 +17,7 @@ dependencies:
   http: ^0.13.5
   upi_payment: ^0.0.1
   lucide_icons: ^0.257.0
-  shared_preferences: ^2.5.3
+  shared_preferences: ^2.5.3 
 
 dev_dependencies:
   flutter_test:

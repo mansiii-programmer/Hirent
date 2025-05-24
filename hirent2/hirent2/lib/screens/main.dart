@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hirent2/screens/otp_screen.dart';
+import 'package:hirent2/screens/sharedpref.dart';
 import 'package:hirent2/screens/sign_in_screen.dart';
 import 'package:hirent2/screens/signup_screen.dart';
 import 'package:hirent2/screens/tp_profile_screen.dart';
@@ -18,7 +19,9 @@ import 'package:hirent2/screens/wallet.dart';
 import 'package:hirent2/screens/security.dart';
 import 'package:hirent2/screens/payment_history.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefService.init();
   runApp(const HirentApp());
 }
 
