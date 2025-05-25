@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/task_seeker_profile.dart'; // adjust the path as per your project structure
 
 class TpHomeScreen extends StatefulWidget {
   const TpHomeScreen({super.key});
@@ -12,9 +13,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
 
   void _onTabTapped(int index) {
     if (index == 1) {
-      // Navigate to create task page or your tasks page
       Navigator.pushNamed(context, '/tp_yourtasks').then((_) {
-        // When coming back, reset currentIndex to 0 (Home)
         setState(() {
           _currentIndex = 0;
         });
@@ -32,7 +31,6 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
         });
       });
     } else {
-      // For index 0 (home), update selected index normally
       setState(() {
         _currentIndex = index;
       });
@@ -68,8 +66,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
             ),
             const SizedBox(width: 8),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
                 color: const Color(0xFFF3ECFF),
                 borderRadius: BorderRadius.circular(20),
@@ -85,14 +82,6 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
             ),
           ],
         ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings, color: Colors.grey[700]),
-            onPressed: () {
-              // Add settings action here
-            },
-          )
-        ],
       ),
       body: Column(
         children: [
@@ -230,6 +219,15 @@ class TaskSeekerCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const TaskSeekerProfile(), // add dynamic data if needed
+            ),
+          );
+        },
         leading: CircleAvatar(
           child: Text(name.split(' ')[0][0]),
         ),
