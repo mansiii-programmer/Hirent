@@ -1,6 +1,5 @@
-import 'package:flutter/material.dart';
-import 'package:http/http.dart' as http;
 import 'dart:convert';
+import 'package:flutter/material.dart';
 
 class Task {
   final String category;
@@ -30,52 +29,26 @@ class TsHomePage extends StatefulWidget {
 }
 
 class _TsHomePageState extends State<TsHomePage> {
-  final List<String> categories = [
-    "All",
-    "Cleaning",
-    "Babysitting",
-    "Gardening",
-    "Cooking",
-    "Pet Care",
-    "Tutoring",
-    "Shopping",
-    "Delivery"
-  ];
-
-  String selectedCategory = "All";
-
-  final List<Task> allTasks = [
-    Task(
-      category: "Cleaning",
-      title: "Cleaning Task",
-      description:
-          "This is a cleaning task that needs to be done. The task involves helping with cleaning services.",
-      location: "San Francisco, CA",
-      timeAgo: "1 day ago",
-      price: "₹16",
-      imagePath: "assets/cleaning.png",
-    ),
-    Task(
-      category: "Babysitting",
-      title: "Evening Babysitter",
-      description: "Need someone to babysit for 3 hours in the evening.",
-      location: "San Jose, CA",
-      timeAgo: "4 days ago",
-      price: "₹40",
-      imagePath: "assets/babysitting.jpg",
-    ),
-    Task(
-      category: "Cooking",
-      title: "Home Chef",
-      description: "Looking for someone to prepare home-cooked meals daily.",
-      location: "Oakland, CA",
-      timeAgo: "2 days ago",
-      price: "₹30",
-      imagePath: "assets/cooking.jpg",
-    ),
-  ];
-
+  late Future<List<Task>> futureTasks;
+  String searchQuery = '';
   int _selectedIndex = 0;
+
+  @override
+  void initState() {
+    super.initState();
+    futureTasks = fetchTasksFromDatabase();
+  }
+
+  Future<List<Task>> fetchTasksFromDatabase() async {
+    final response = await http.get(Uri.parse('http://127.0.0.1:8000/tasks'));
+
+    if (response.statusCode == 200) {
+      final List<dynamic> taskList = jsonDecode(response.body);
+      return taskList.map((taskData) => Task.fromMap(taskData)).toList();
+    } else {
+      throw Exception('Failed to load tasks');
+    }
+  }
 
   void _onTabTapped(int index) {
     if (index == 1) {
@@ -118,16 +91,7 @@ class _TsHomePageState extends State<TsHomePage> {
 
   @override
   Widget build(BuildContext context) {
-    final List<Task> filteredTasks = selectedCategory == "All"
-        ? allTasks
-        : allTasks
-            .where((task) =>
-                task.category.toLowerCase() ==
-                selectedCategory.toLowerCase())
-            .toList();
-
     return Scaffold(
-      backgroundColor: Colors.grey[50],
       appBar: AppBar(
         backgroundColor: Colors.white,
         elevation: 0,
@@ -156,7 +120,7 @@ class _TsHomePageState extends State<TsHomePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: Color(0xFFF3ECFF),
+                color: const Color(0xFFF3ECFF),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
@@ -173,7 +137,9 @@ class _TsHomePageState extends State<TsHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Colors.grey[700]),
-            onPressed: () {},
+            onPressed: () {
+              // Add settings action here
+            },
           )
         ],
       ),
@@ -183,6 +149,7 @@ class _TsHomePageState extends State<TsHomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
+              // Search Bar
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
@@ -198,47 +165,111 @@ class _TsHomePageState extends State<TsHomePage> {
                 ),
               ),
               const SizedBox(height: 20),
+
+              // Category Chips
               SizedBox(
                 height: 40,
                 child: ListView.builder(
                   scrollDirection: Axis.horizontal,
                   itemCount: categories.length,
                   itemBuilder: (context, index) {
-                    final category = categories[index];
-                    final isSelected = selectedCategory == category;
-                    return Padding(
-                      padding: const EdgeInsets.only(right: 8),
-                      child: ChoiceChip(
-                        label: Text(
-                          category,
-                          style: TextStyle(
-                            color: isSelected
-                                ? Colors.black87
-                                : Colors.grey[800],
-                            fontWeight: FontWeight.w500,
+                    final task = filteredTasks[index];
+                    return Card(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(16),
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                                top: Radius.circular(16)),
+                            child: Image.network(
+                              task.imagePath,
+                              height: 200,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                              errorBuilder: (_, __, ___) => const SizedBox(
+                                height: 200,
+                                child: Center(
+                                    child: Icon(Icons.image_not_supported)),
+                              ),
+                            ),
                           ),
-                        ),
-                        selected: isSelected,
-                        onSelected: (_) {
-                          setState(() => selectedCategory = category);
-                        },
-                        selectedColor: Colors.white,
-                        backgroundColor: const Color(0xFFF0EEE9),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10),
-                        ),
-                        elevation: isSelected ? 2 : 0,
+                          Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  task.category,
+                                  style: const TextStyle(
+                                    fontSize: 14,
+                                    color: Colors.blueAccent,
+                                    fontWeight: FontWeight.w500,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(
+                                  task.title,
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+                                const SizedBox(height: 4),
+                                Text(task.description),
+                                const SizedBox(height: 4),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.location_on, size: 16),
+                                        const SizedBox(width: 4),
+                                        Text(task.location),
+                                      ],
+                                    ),
+                                    Row(
+                                      children: [
+                                        const Icon(Icons.access_time, size: 16),
+                                        const SizedBox(width: 4),
+                                        Text(task.timeAgo),
+                                      ],
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 8),
+                                Align(
+                                  alignment: Alignment.bottomRight,
+                                  child: Text(
+                                    task.price,
+                                    style: const TextStyle(
+                                      fontSize: 16,
+                                      fontWeight: FontWeight.w600,
+                                      color: Colors.green,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
                       ),
                     );
                   },
                 ),
               ),
               const SizedBox(height: 25),
+
               const Text(
                 "Recommended Tasks",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
+
               ...filteredTasks.map((task) => taskCard(task)),
             ],
           ),
@@ -406,8 +437,12 @@ class _TsHomePageState extends State<TsHomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        // NOTE: replace with real taskId and seeker id
-                        acceptTask("replace_with_task_id", "test_seeker_id");
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Accepted: ${task.title}'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,

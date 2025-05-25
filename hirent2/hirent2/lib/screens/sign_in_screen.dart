@@ -60,7 +60,8 @@ class _SignInPageState extends State<SignInPage> {
       final response = await http.post(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'email': email, 'password': password,'role':enteredRole}),
+        body: jsonEncode(
+            {'email': email, 'password': password, 'role': enteredRole}),
       );
 
       if (response.statusCode == 200) {
@@ -83,7 +84,7 @@ class _SignInPageState extends State<SignInPage> {
         if (backendRole == 'seeker') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => const TsHomePage()),
+            MaterialPageRoute(builder: (context) => TsHomePage()),
           );
         } else if (backendRole == 'provider') {
           Navigator.pushReplacement(
@@ -164,7 +165,8 @@ class _SignInPageState extends State<SignInPage> {
                     controller: _passwordController,
                     obscureText: _obscurePassword,
                     validator: _validatePassword,
-                    decoration: _inputDecoration('Enter your password').copyWith(
+                    decoration:
+                        _inputDecoration('Enter your password').copyWith(
                       suffixIcon: IconButton(
                         icon: Icon(
                           _obscurePassword
