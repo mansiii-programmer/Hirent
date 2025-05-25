@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/task_seeker_profile.dart'; // adjust the path as per your project structure
 
 class TpHomeScreen extends StatefulWidget {
   const TpHomeScreen({super.key});
@@ -12,36 +13,75 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
 
   void _onTabTapped(int index) {
     if (index == 1) {
-      Navigator.pushNamed(context, '/tp_yourtasks');
+      Navigator.pushNamed(context, '/tp_yourtasks').then((_) {
+        setState(() {
+          _currentIndex = 0;
+        });
+      });
     } else if (index == 2) {
-      Navigator.pushNamed(context, '/tp_messages');
+      Navigator.pushNamed(context, '/tp_messages').then((_) {
+        setState(() {
+          _currentIndex = 0;
+        });
+      });
     } else if (index == 3) {
-      Navigator.pushNamed(context, '/tp_profile');
+      Navigator.pushNamed(context, '/tp_profile').then((_) {
+        setState(() {
+          _currentIndex = 0;
+        });
+      });
+    } else {
+      setState(() {
+        _currentIndex = index;
+      });
     }
-
-    setState(() {
-      _currentIndex = index;
-    });
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Find Task Seekers'),
         backgroundColor: Colors.white,
         elevation: 0,
-        titleTextStyle: const TextStyle(
-          fontSize: 22,
-          fontWeight: FontWeight.bold,
-          color: Colors.black,
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.center,
+          children: [
+            ShaderMask(
+              shaderCallback: (bounds) => const LinearGradient(
+                colors: [
+                  Color(0xFF8E2DE2),
+                  Color.fromARGB(255, 196, 167, 211),
+                  Color.fromARGB(255, 137, 85, 164)
+                ],
+              ).createShader(Rect.fromLTWH(0, 0, bounds.width, bounds.height)),
+              child: const Text(
+                'HIRENT',
+                style: TextStyle(
+                  fontSize: 26,
+                  fontWeight: FontWeight.w800,
+                  color: Colors.white,
+                  letterSpacing: 1.2,
+                ),
+              ),
+            ),
+            const SizedBox(width: 8),
+            Container(
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              decoration: BoxDecoration(
+                color: const Color(0xFFF3ECFF),
+                borderRadius: BorderRadius.circular(20),
+              ),
+              child: const Text(
+                'Task Provider',
+                style: TextStyle(
+                  color: Colors.black87,
+                  fontSize: 13,
+                  fontWeight: FontWeight.w500,
+                ),
+              ),
+            ),
+          ],
         ),
-        actions: [
-          IconButton(
-            icon: const Icon(Icons.settings, color: Colors.black),
-            onPressed: () {},
-          ),
-        ],
       ),
       body: Column(
         children: [
@@ -49,7 +89,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
             padding: EdgeInsets.all(16.0),
             child: TextField(
               decoration: InputDecoration(
-                hintText: 'Search for task seekers...',
+                hintText: 'Search for task providers...',
                 prefixIcon: Icon(Icons.search),
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.all(Radius.circular(12)),
@@ -129,7 +169,7 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.task),
-            label: 'Create Task',
+            label: 'My Tasks',
           ),
           BottomNavigationBarItem(
             icon: Icon(Icons.chat),
@@ -179,6 +219,15 @@ class TaskSeekerCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const TaskSeekerProfile(), // add dynamic data if needed
+            ),
+          );
+        },
         leading: CircleAvatar(
           child: Text(name.split(' ')[0][0]),
         ),

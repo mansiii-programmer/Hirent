@@ -8,6 +8,8 @@ class PaymentHistoryPage extends StatelessWidget {
     Transaction(date: '10 Apr 2025', description: 'Task completion: Babysitting', amount: 1200),
   ];
 
+  PaymentHistoryPage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(

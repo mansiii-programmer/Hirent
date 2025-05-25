@@ -34,6 +34,8 @@ class ChatPage extends StatelessWidget {
     },
   ];
 
+  ChatPage({super.key});
+
   String getTimeAgo(DateTime time) {
     final now = DateTime.now();
     final diff = now.difference(time);
@@ -102,7 +104,8 @@ class ChatPage extends StatelessWidget {
                       children: [
                         Text(
                           getTimeAgo(msg['time']),
-                          style: const TextStyle(fontSize: 12, color: Colors.grey),
+                          style:
+                              const TextStyle(fontSize: 12, color: Colors.grey),
                         ),
                         if (msg['unread'] > 0)
                           Container(
@@ -114,7 +117,8 @@ class ChatPage extends StatelessWidget {
                             ),
                             child: Text(
                               msg['unread'].toString(),
-                              style: const TextStyle(color: Colors.white, fontSize: 12),
+                              style: const TextStyle(
+                                  color: Colors.white, fontSize: 12),
                             ),
                           ),
                       ],
@@ -125,17 +129,6 @@ class ChatPage extends StatelessWidget {
               },
             ),
           ),
-        ],
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        selectedItemColor: Colors.purple,
-        unselectedItemColor: Colors.grey,
-        currentIndex: 2,
-        items: const [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.check_box), label: 'My Tasks'),
-          BottomNavigationBarItem(icon: Icon(Icons.chat_bubble), label: 'Chat'),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );

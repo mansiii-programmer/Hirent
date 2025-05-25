@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:hirent2/screens/otp_screen.dart';
+import 'package:hirent2/screens/sharedpref.dart';
 import 'package:hirent2/screens/sign_in_screen.dart';
 import 'package:hirent2/screens/signup_screen.dart';
 import 'package:hirent2/screens/tp_profile_screen.dart';
@@ -18,7 +19,9 @@ import 'package:hirent2/screens/wallet.dart';
 import 'package:hirent2/screens/security.dart';
 import 'package:hirent2/screens/payment_history.dart';
 
-void main() {
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await SharedPrefService.init();
   runApp(const HirentApp());
 }
 
@@ -39,17 +42,17 @@ class HirentApp extends StatelessWidget {
         if (settings.name == '/otp') {
           final args = settings.arguments as Map<String, dynamic>?;
           return MaterialPageRoute(
-            builder: (context) => OTPVerificationPage(),
+            builder: (context) => OTPVerificationPage(signUpData: args ?? {}),
             settings: RouteSettings(arguments: args),
           );
         }
 
         switch (settings.name) {
           case '/signin':
-            return MaterialPageRoute(builder: (_) => SignInPage());
+            return MaterialPageRoute(builder: (_) => const SignInPage());
           case '/signup':
             return MaterialPageRoute(
-                builder: (_) => SignUpScreen(selectedRole: ''));
+                builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/seekerMain':
             return MaterialPageRoute(builder: (_) => TsHomePage());
           case '/providerMain':
@@ -66,12 +69,10 @@ class HirentApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => RoleSelectionPage());
           case '/seekerLogin':
             return MaterialPageRoute(
-                builder: (_) => SignUpScreen(selectedRole: ''));
+                builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/providerLogin':
             return MaterialPageRoute(
-                builder: (_) => SignUpScreen(selectedRole: ''));
-
-          // ✅ NEW ROUTES
+                builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/settings':
             return MaterialPageRoute(builder: (_) => SettingsPage());
           case '/wallet':
@@ -86,9 +87,8 @@ class HirentApp extends StatelessWidget {
             return MaterialPageRoute(builder: (_) => ChatPage());
           case '/createTask':
             return MaterialPageRoute(builder: (_) => CreateTaskScreen());
-
           default:
-            return MaterialPageRoute(builder: (_) => SplashScreen());
+            return MaterialPageRoute(builder: (_) => const SplashScreen());
         }
       },
     );
