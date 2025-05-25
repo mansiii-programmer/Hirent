@@ -46,6 +46,17 @@ class _TsHomePageState extends State<TsHomePage> {
 
   @override
   Widget build(BuildContext context) {
+<<<<<<< HEAD
+=======
+    final List<Task> filteredTasks = selectedCategory == "All"
+        ? allTasks
+        : allTasks
+            .where((task) =>
+                task.category.toLowerCase() ==
+                selectedCategory.toLowerCase())
+            .toList();
+
+>>>>>>> cac194a0337ed4d2695a864e6dd4eb8a0fbd98d2
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Colors.white,
@@ -75,7 +86,7 @@ class _TsHomePageState extends State<TsHomePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3ECFF),
+                color: Color(0xFFF3ECFF),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
@@ -92,9 +103,7 @@ class _TsHomePageState extends State<TsHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Colors.grey[700]),
-            onPressed: () {
-              // Add settings action here
-            },
+            onPressed: () {},
           )
         ],
       ),
@@ -260,6 +269,7 @@ class _TsHomePageState extends State<TsHomePage> {
   }
 }
 
+<<<<<<< HEAD
 class Task {
   final String category;
   final String title;
@@ -288,6 +298,167 @@ class Task {
       timeAgo: map['timeAgo'] ?? '',
       price: map['price'] ?? '',
       imagePath: map['imagePath'] ?? '',
+=======
+  Widget taskCard(Task task) {
+    return Container(
+      margin: const EdgeInsets.only(bottom: 20),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(16),
+        color: Colors.white,
+        boxShadow: const [
+          BoxShadow(
+            color: Colors.black12,
+            blurRadius: 6,
+            offset: Offset(0, 2),
+          )
+        ],
+      ),
+      child: Column(
+        children: [
+          Stack(
+            children: [
+              ClipRRect(
+                borderRadius:
+                    const BorderRadius.vertical(top: Radius.circular(16)),
+                child: Image.asset(
+                  task.imagePath,
+                  height: 160,
+                  width: double.infinity,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Container(
+                      color: Colors.grey[300],
+                      height: 160,
+                      width: double.infinity,
+                      child: Center(
+                        child: Icon(
+                          Icons.image_not_supported,
+                          color: Colors.grey[600],
+                          size: 40,
+                        ),
+                      ),
+                    );
+                  },
+                ),
+              ),
+              Positioned(
+                top: 8,
+                left: 8,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.blueAccent,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Text(
+                    task.category,
+                    style: const TextStyle(
+                      color: Colors.white,
+                      fontSize: 12,
+                    ),
+                  ),
+                ),
+              ),
+              Positioned(
+                top: 8,
+                right: 8,
+                child: Container(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                  decoration: BoxDecoration(
+                    color: Colors.black87,
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  child: Row(
+                    children: [
+                      const Icon(Icons.calendar_today,
+                          color: Colors.white, size: 12),
+                      const SizedBox(width: 4),
+                      Text(
+                        task.timeAgo,
+                        style:
+                            const TextStyle(color: Colors.white, fontSize: 12),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            ],
+          ),
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  task.title,
+                  style: const TextStyle(
+                      fontSize: 16, fontWeight: FontWeight.w600),
+                ),
+                const SizedBox(height: 6),
+                Text(
+                  task.description,
+                  style: const TextStyle(color: Colors.black87, fontSize: 13),
+                ),
+                const SizedBox(height: 10),
+                Row(
+                  children: [
+                    const Icon(Icons.location_on, size: 14),
+                    const SizedBox(width: 4),
+                    Text(
+                      task.location,
+                      style: const TextStyle(
+                          fontSize: 13, color: Colors.black54),
+                    ),
+                    const Spacer(),
+                    Container(
+                      padding: const EdgeInsets.symmetric(
+                          horizontal: 10, vertical: 6),
+                      decoration: BoxDecoration(
+                        color: Colors.green[100],
+                        borderRadius: BorderRadius.circular(20),
+                      ),
+                      child: Text(
+                        task.price,
+                        style: const TextStyle(
+                            color: Colors.green, fontWeight: FontWeight.bold),
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Accepted: ${task.title}'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.deepPurple,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Accept'),
+                    ),
+                  ],
+                ),
+              ],
+            ),
+          )
+        ],
+      ),
+>>>>>>> cac194a0337ed4d2695a864e6dd4eb8a0fbd98d2
     );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/task_seeker_profile.dart'; // adjust the path as per your project structure
 
 class TpHomeScreen extends StatefulWidget {
   const TpHomeScreen({super.key});
@@ -218,6 +219,15 @@ class TaskSeekerCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: ListTile(
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) =>
+                  const TaskSeekerProfile(), // add dynamic data if needed
+            ),
+          );
+        },
         leading: CircleAvatar(
           child: Text(name.split(' ')[0][0]),
         ),
