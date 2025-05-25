@@ -76,7 +76,7 @@ class HirentApp extends StatelessWidget {
           case '/settings':
             return MaterialPageRoute(builder: (_) => SettingsPage());
           case '/wallet':
-            return MaterialPageRoute(builder: (_) => WalletPage());
+            return MaterialPageRoute(builder: (_) => WalletPage(userId: '',));
           case '/security':
             return MaterialPageRoute(builder: (_) => SecurityPage());
           case '/paymentHistory':

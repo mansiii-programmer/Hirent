@@ -18,6 +18,8 @@ dependencies:
   upi_payment: ^0.0.1
   lucide_icons: ^0.257.0
   shared_preferences: ^2.5.3 
+  fluttertoast: ^8.2.4
+
 
 dev_dependencies:
   flutter_test:
@@ -28,3 +30,5 @@ flutter:
   uses-material-design: true
   assets:
     - assets/images/hirentlogo.jpg
+    - assets/  # <-- add this to load cleaning.png, babysitting.jpg, cooking.jpg etc.
+

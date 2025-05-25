@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class Task {
   final String category;
@@ -88,6 +90,32 @@ class _TsHomePageState extends State<TsHomePage> {
     });
   }
 
+  Future<void> acceptTask(String taskId, String assignedTo) async {
+    final url = Uri.parse('http://127.0.0.1:8000/accept/$taskId');
+    final response = await http.put(
+      url,
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'assigned_to': assignedTo}),
+    );
+
+    if (response.statusCode == 200) {
+      final result = jsonDecode(response.body);
+      if (result['message'] == "Task accepted successfully") {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Task accepted")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text(result['error'] ?? "Error accepting task")),
+        );
+      }
+    } else {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Server error")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final List<Task> filteredTasks = selectedCategory == "All"
@@ -155,7 +183,6 @@ class _TsHomePageState extends State<TsHomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // Search Bar
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 16),
                 decoration: BoxDecoration(
@@ -171,8 +198,6 @@ class _TsHomePageState extends State<TsHomePage> {
                 ),
               ),
               const SizedBox(height: 20),
-
-              // Category Chips
               SizedBox(
                 height: 40,
                 child: ListView.builder(
@@ -209,13 +234,11 @@ class _TsHomePageState extends State<TsHomePage> {
                 ),
               ),
               const SizedBox(height: 25),
-
               const Text(
                 "Recommended Tasks",
                 style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 16),
-
               ...filteredTasks.map((task) => taskCard(task)),
             ],
           ),
@@ -383,12 +406,8 @@ class _TsHomePageState extends State<TsHomePage> {
                   children: [
                     ElevatedButton(
                       onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Accepted: ${task.title}'),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
+                        // NOTE: replace with real taskId and seeker id
+                        acceptTask("replace_with_task_id", "test_seeker_id");
                       },
                       style: ElevatedButton.styleFrom(
                         foregroundColor: Colors.white,
