@@ -95,7 +95,7 @@ class _TsHomePageState extends State<TsHomePage> {
         : allTasks
             .where((task) =>
                 task.category.toLowerCase() ==
-                selectedCategory.toLowerCase()) // Exact match
+                selectedCategory.toLowerCase())
             .toList();
 
     return Scaffold(
@@ -126,10 +126,9 @@ class _TsHomePageState extends State<TsHomePage> {
             ),
             const SizedBox(width: 8),
             Container(
-              padding:
-                  const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+              padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3ECFF),
+                color: Color(0xFFF3ECFF),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
@@ -146,9 +145,7 @@ class _TsHomePageState extends State<TsHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Colors.grey[700]),
-            onPressed: () {
-              // Add settings action here
-            },
+            onPressed: () {},
           )
         ],
       ),
@@ -361,8 +358,8 @@ class _TsHomePageState extends State<TsHomePage> {
                     const SizedBox(width: 4),
                     Text(
                       task.location,
-                      style:
-                          const TextStyle(fontSize: 13, color: Colors.black54),
+                      style: const TextStyle(
+                          fontSize: 13, color: Colors.black54),
                     ),
                     const Spacer(),
                     Container(
@@ -377,6 +374,32 @@ class _TsHomePageState extends State<TsHomePage> {
                         style: const TextStyle(
                             color: Colors.green, fontWeight: FontWeight.bold),
                       ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 12),
+                Row(
+                  mainAxisAlignment: MainAxisAlignment.end,
+                  children: [
+                    ElevatedButton(
+                      onPressed: () {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(
+                            content: Text('Accepted: ${task.title}'),
+                            duration: const Duration(seconds: 2),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        foregroundColor: Colors.white,
+                        backgroundColor: Colors.deepPurple,
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 20, vertical: 8),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(12),
+                        ),
+                      ),
+                      child: const Text('Accept'),
                     ),
                   ],
                 ),
