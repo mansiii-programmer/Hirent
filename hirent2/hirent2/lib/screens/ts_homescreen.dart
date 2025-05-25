@@ -1,25 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
-
-class Task {
-  final String category;
-  final String title;
-  final String description;
-  final String location;
-  final String timeAgo;
-  final String price;
-  final String imagePath;
-
-  Task({
-    required this.category,
-    required this.title,
-    required this.description,
-    required this.location,
-    required this.timeAgo,
-    required this.price,
-    required this.imagePath,
-  });
-}
+import 'package:http/http.dart' as http;
 
 class TsHomePage extends StatefulWidget {
   const TsHomePage({super.key});
@@ -61,32 +42,6 @@ class _TsHomePageState extends State<TsHomePage> {
     setState(() {
       _selectedIndex = index;
     });
-  }
-
-  Future<void> acceptTask(String taskId, String assignedTo) async {
-    final url = Uri.parse('http://127.0.0.1:8000/accept/$taskId');
-    final response = await http.put(
-      url,
-      headers: {'Content-Type': 'application/json'},
-      body: jsonEncode({'assigned_to': assignedTo}),
-    );
-
-    if (response.statusCode == 200) {
-      final result = jsonDecode(response.body);
-      if (result['message'] == "Task accepted successfully") {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text("Task accepted")),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(result['error'] ?? "Error accepting task")),
-        );
-      }
-    } else {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text("Server error")),
-      );
-    }
   }
 
   @override
@@ -143,35 +98,45 @@ class _TsHomePageState extends State<TsHomePage> {
           )
         ],
       ),
-      body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Search Bar
-              Container(
-                padding: const EdgeInsets.symmetric(horizontal: 16),
-                decoration: BoxDecoration(
-                  color: Colors.grey[200],
-                  borderRadius: BorderRadius.circular(25),
-                ),
-                child: const TextField(
-                  decoration: InputDecoration(
-                    icon: Icon(Icons.search),
-                    hintText: "Search for tasks...",
-                    border: InputBorder.none,
-                  ),
+      body: Column(
+        children: [
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: TextField(
+              decoration: InputDecoration(
+                hintText: "Search tasks...",
+                prefixIcon: const Icon(Icons.search),
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(12),
                 ),
               ),
-              const SizedBox(height: 20),
+              onChanged: (value) {
+                setState(() {
+                  searchQuery = value.toLowerCase();
+                });
+              },
+            ),
+          ),
+          Expanded(
+            child: FutureBuilder<List<Task>>(
+              future: futureTasks,
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Center(child: CircularProgressIndicator());
+                } else if (snapshot.hasError) {
+                  return Center(child: Text('Error: ${snapshot.error}'));
+                }
 
-              // Category Chips
-              SizedBox(
-                height: 40,
-                child: ListView.builder(
-                  scrollDirection: Axis.horizontal,
-                  itemCount: categories.length,
+                final filteredTasks = snapshot.data!
+                    .where((task) =>
+                        task.title.toLowerCase().contains(searchQuery) ||
+                        task.description.toLowerCase().contains(searchQuery) ||
+                        task.location.toLowerCase().contains(searchQuery))
+                    .toList();
+
+                return ListView.builder(
+                  padding: const EdgeInsets.all(12),
+                  itemCount: filteredTasks.length,
                   itemBuilder: (context, index) {
                     final task = filteredTasks[index];
                     return Card(
@@ -260,20 +225,11 @@ class _TsHomePageState extends State<TsHomePage> {
                       ),
                     );
                   },
-                ),
-              ),
-              const SizedBox(height: 25),
-
-              const Text(
-                "Recommended Tasks",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              const SizedBox(height: 16),
-
-              ...filteredTasks.map((task) => taskCard(task)),
-            ],
+                );
+              },
+            ),
           ),
-        ),
+        ],
       ),
       bottomNavigationBar: BottomNavigationBar(
         backgroundColor: Colors.white,
@@ -302,166 +258,36 @@ class _TsHomePageState extends State<TsHomePage> {
       ),
     );
   }
+}
 
-  Widget taskCard(Task task) {
-    return Container(
-      margin: const EdgeInsets.only(bottom: 20),
-      decoration: BoxDecoration(
-        borderRadius: BorderRadius.circular(16),
-        color: Colors.white,
-        boxShadow: const [
-          BoxShadow(
-            color: Colors.black12,
-            blurRadius: 6,
-            offset: Offset(0, 2),
-          )
-        ],
-      ),
-      child: Column(
-        children: [
-          Stack(
-            children: [
-              ClipRRect(
-                borderRadius:
-                    const BorderRadius.vertical(top: Radius.circular(16)),
-                child: Image.asset(
-                  task.imagePath,
-                  height: 160,
-                  width: double.infinity,
-                  fit: BoxFit.cover,
-                  errorBuilder: (context, error, stackTrace) {
-                    return Container(
-                      color: Colors.grey[300],
-                      height: 160,
-                      width: double.infinity,
-                      child: Center(
-                        child: Icon(
-                          Icons.image_not_supported,
-                          color: Colors.grey[600],
-                          size: 40,
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ),
-              Positioned(
-                top: 8,
-                left: 8,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.blueAccent,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Text(
-                    task.category,
-                    style: const TextStyle(
-                      color: Colors.white,
-                      fontSize: 12,
-                    ),
-                  ),
-                ),
-              ),
-              Positioned(
-                top: 8,
-                right: 8,
-                child: Container(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
-                  decoration: BoxDecoration(
-                    color: Colors.black87,
-                    borderRadius: BorderRadius.circular(12),
-                  ),
-                  child: Row(
-                    children: [
-                      const Icon(Icons.calendar_today,
-                          color: Colors.white, size: 12),
-                      const SizedBox(width: 4),
-                      Text(
-                        task.timeAgo,
-                        style:
-                            const TextStyle(color: Colors.white, fontSize: 12),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Padding(
-            padding: const EdgeInsets.all(12),
-            child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                Text(
-                  task.title,
-                  style: const TextStyle(
-                      fontSize: 16, fontWeight: FontWeight.w600),
-                ),
-                const SizedBox(height: 6),
-                Text(
-                  task.description,
-                  style: const TextStyle(color: Colors.black87, fontSize: 13),
-                ),
-                const SizedBox(height: 10),
-                Row(
-                  children: [
-                    const Icon(Icons.location_on, size: 14),
-                    const SizedBox(width: 4),
-                    Text(
-                      task.location,
-                      style: const TextStyle(
-                          fontSize: 13, color: Colors.black54),
-                    ),
-                    const Spacer(),
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 10, vertical: 6),
-                      decoration: BoxDecoration(
-                        color: Colors.green[100],
-                        borderRadius: BorderRadius.circular(20),
-                      ),
-                      child: Text(
-                        task.price,
-                        style: const TextStyle(
-                            color: Colors.green, fontWeight: FontWeight.bold),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 12),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.end,
-                  children: [
-                    ElevatedButton(
-                      onPressed: () {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          SnackBar(
-                            content: Text('Accepted: ${task.title}'),
-                            duration: const Duration(seconds: 2),
-                          ),
-                        );
-                      },
-                      style: ElevatedButton.styleFrom(
-                        foregroundColor: Colors.white,
-                        backgroundColor: Colors.deepPurple,
-                        padding: const EdgeInsets.symmetric(
-                            horizontal: 20, vertical: 8),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(12),
-                        ),
-                      ),
-                      child: const Text('Accept'),
-                    ),
-                  ],
-                ),
-              ],
-            ),
-          )
-        ],
-      ),
+class Task {
+  final String category;
+  final String title;
+  final String description;
+  final String location;
+  final String timeAgo;
+  final String price;
+  final String imagePath;
+
+  Task({
+    required this.category,
+    required this.title,
+    required this.description,
+    required this.location,
+    required this.timeAgo,
+    required this.price,
+    required this.imagePath,
+  });
+
+  factory Task.fromMap(Map<String, dynamic> map) {
+    return Task(
+      category: map['category'] ?? '',
+      title: map['title'] ?? '',
+      description: map['description'] ?? '',
+      location: map['location'] ?? '',
+      timeAgo: map['timeAgo'] ?? '',
+      price: map['price'] ?? '',
+      imagePath: map['imagePath'] ?? '',
     );
   }
 }
