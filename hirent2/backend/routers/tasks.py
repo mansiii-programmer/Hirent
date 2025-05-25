@@ -79,3 +79,6 @@ def accept_task(task_id: str, assigned_to: str = Body(..., embed=True)):
     if result.modified_count == 1:
         return {"message": "Task accepted successfully"}
     return {"error": "Task not found or already assigned"}
+@router.get("/tasks/category")
+def get_tasks_by_category(cat: str):
+    return {"category": cat}
