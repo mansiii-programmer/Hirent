@@ -84,7 +84,7 @@ class _SignInPageState extends State<SignInPage> {
         if (backendRole == 'seeker') {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => TsHomePage()),
+            MaterialPageRoute(builder: (context) =>TsHomePage(seekerId: '68225f34d92bb78dd1e27274',))
           );
         } else if (backendRole == 'provider') {
           Navigator.pushReplacement(

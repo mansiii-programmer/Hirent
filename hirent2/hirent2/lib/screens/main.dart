@@ -54,7 +54,7 @@ class HirentApp extends StatelessWidget {
             return MaterialPageRoute(
                 builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/seekerMain':
-            return MaterialPageRoute(builder: (_) => TsHomePage());
+            return MaterialPageRoute(builder: (_) => TsHomePage(seekerId: '68225f34d92bb78dd1e27274',));
           case '/providerMain':
             return MaterialPageRoute(builder: (_) => TpHomeScreen());
           case '/ts_profile':

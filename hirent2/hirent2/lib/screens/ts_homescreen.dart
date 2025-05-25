@@ -3,7 +3,9 @@ import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
 class TsHomePage extends StatefulWidget {
-  const TsHomePage({super.key});
+  final String seekerId; // pass this on navigation
+
+  const TsHomePage({super.key, required this.seekerId});
 
   @override
   State<TsHomePage> createState() => _TsHomePageState();
@@ -28,6 +30,36 @@ class _TsHomePageState extends State<TsHomePage> {
       return taskList.map((taskData) => Task.fromMap(taskData)).toList();
     } else {
       throw Exception('Failed to load tasks');
+    }
+  }
+
+  Future<void> acceptTask(String taskId) async {
+    final url = Uri.parse('http://127.0.0.1:8000/accept/$taskId');
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: jsonEncode({'assigned_to': widget.seekerId}),
+      );
+
+      if (response.statusCode == 200 &&
+          jsonDecode(response.body)['message'] == 'Task accepted successfully') {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Task accepted successfully')),
+        );
+        // Refresh task list
+        setState(() {
+          futureTasks = fetchTasksFromDatabase();
+        });
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Task already assigned or not found')),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Error: $e')),
+      );
     }
   }
 
@@ -75,7 +107,7 @@ class _TsHomePageState extends State<TsHomePage> {
             Container(
               padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
               decoration: BoxDecoration(
-                color: const Color(0xFFF3ECFF),
+                color: Color(0xFFF3ECFF),
                 borderRadius: BorderRadius.circular(20),
               ),
               child: const Text(
@@ -92,9 +124,7 @@ class _TsHomePageState extends State<TsHomePage> {
         actions: [
           IconButton(
             icon: Icon(Icons.settings, color: Colors.grey[700]),
-            onPressed: () {
-              // Add settings action here
-            },
+            onPressed: () {},
           )
         ],
       ),
@@ -157,8 +187,8 @@ class _TsHomePageState extends State<TsHomePage> {
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => const SizedBox(
                                 height: 200,
-                                child: Center(
-                                    child: Icon(Icons.image_not_supported)),
+                                child:
+                                    Center(child: Icon(Icons.image_not_supported)),
                               ),
                             ),
                           ),
@@ -218,6 +248,20 @@ class _TsHomePageState extends State<TsHomePage> {
                                     ),
                                   ),
                                 ),
+                                const SizedBox(height: 8),
+                                ElevatedButton(
+                                  onPressed: () => acceptTask(task.taskId),
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: Colors.deepPurple,
+                                    foregroundColor: Colors.white,
+                                    padding: const EdgeInsets.symmetric(
+                                        horizontal: 16, vertical: 10),
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                  ),
+                                  child: const Text("Accept"),
+                                ),
                               ],
                             ),
                           ),
@@ -238,22 +282,10 @@ class _TsHomePageState extends State<TsHomePage> {
         currentIndex: _selectedIndex,
         onTap: _onTabTapped,
         items: const [
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.task),
-            label: 'My Tasks',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.chat),
-            label: 'Messages',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          BottomNavigationBarItem(icon: Icon(Icons.task), label: 'My Tasks'),
+          BottomNavigationBarItem(icon: Icon(Icons.chat), label: 'Messages'),
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
       ),
     );
@@ -261,6 +293,7 @@ class _TsHomePageState extends State<TsHomePage> {
 }
 
 class Task {
+  final String taskId;
   final String category;
   final String title;
   final String description;
@@ -270,6 +303,7 @@ class Task {
   final String imagePath;
 
   Task({
+    required this.taskId,
     required this.category,
     required this.title,
     required this.description,
@@ -281,6 +315,7 @@ class Task {
 
   factory Task.fromMap(Map<String, dynamic> map) {
     return Task(
+      taskId: map['_id'].toString(),
       category: map['category'] ?? '',
       title: map['title'] ?? '',
       description: map['description'] ?? '',
