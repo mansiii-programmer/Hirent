@@ -1,8 +1,55 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'package:hirent2/screens/sharedpref.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
-class TPProfileSettingsPage extends StatelessWidget {
+class UserProfile {
+  final String name;
+  final String email;
+  final String location;
+
+  UserProfile(
+      {required this.name, required this.email, required this.location});
+
+  factory UserProfile.fromJson(Map<String, dynamic> json) {
+    return UserProfile(
+      name: json['username'] ?? 'Unknown',
+      email: json['email'] ?? 'unknown@example.com',
+      location: json['location'] ?? 'Not set',
+    );
+  }
+}
+
+Future<UserProfile> fetchUserProfile() async {
+  final String? userId = await SharedPrefService.getUserId(); // async get
+  if (userId == null) throw Exception('User ID not found');
+
+  final response = await http.get(
+    Uri.parse('http://127.0.0.1:8000/users/users/$userId'),
+  );
+  if (response.statusCode == 200) {
+    return UserProfile.fromJson(jsonDecode(response.body));
+  } else {
+    throw Exception('Failed to load user profile');
+  }
+}
+
+class TPProfileSettingsPage extends StatefulWidget {
   const TPProfileSettingsPage({super.key});
+
+  @override
+  State<TPProfileSettingsPage> createState() => _TPProfileSettingsPageState();
+}
+
+class _TPProfileSettingsPageState extends State<TPProfileSettingsPage> {
+  late Future<UserProfile> futureUser;
+
+  @override
+  void initState() {
+    super.initState();
+    futureUser = fetchUserProfile();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,96 +62,108 @@ class TPProfileSettingsPage extends StatelessWidget {
         centerTitle: false,
         foregroundColor: Colors.black87,
       ),
-      body: SingleChildScrollView(
-        padding: const EdgeInsets.symmetric(horizontal: 16),
-        child: Column(
-          children: [
-            Container(
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 14, 113, 128),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
-                    children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.person_outline,
-                            color: Colors.teal, size: 30),
-                      ),
-                      SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          Text("Mansiiii",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold)),
-                          Text("mansi.awasthi222@gmail.com",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 14)),
-                          Row(
-                            children: [
-                              Icon(Icons.location_on,
-                                  color: Colors.white, size: 14),
-                              SizedBox(width: 4),
-                              Text("Mumbai, Maharashtra",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ],
-                          ),
-                        ],
-                      )
-                    ],
-                  ),
-                  const Divider(height: 24, color: Colors.transparent),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      _ProfileStat(count: "0", label: "Tasks"),
-                      VerticalDivider(color: Colors.white70, thickness: 1),
-                      _ProfileStat(count: "★ 0.0", label: "Rating"),
-                      VerticalDivider(color: Colors.white70, thickness: 1),
-                      _ProfileStat(count: "₹0", label: "Earned"),
-                    ],
-                  ),
-                ],
-              ),
-            ),
-            const SizedBox(height: 16),
+      body: FutureBuilder<UserProfile>(
+        future: futureUser,
+        builder: (context, snapshot) {
+          if (snapshot.connectionState == ConnectionState.waiting) {
+            return const Center(child: CircularProgressIndicator());
+          } else if (snapshot.hasError) {
+            return Center(child: Text("Error: ${snapshot.error}"));
+          } else if (!snapshot.hasData) {
+            return const Center(child: Text("No user data found."));
+          }
 
-            // List of Profile Items with Routes
-            const _ProfileItem(
-                icon: LucideIcons.checkSquare,
-                title: "Create tasks",
-                routeName: '/tp_yourtasks'),
-            const _ProfileItem(
-                icon: LucideIcons.messageCircle,
-                title: "Messages",
-                routeName: '/tp_messages'),
-            const _ProfileItem(
-                icon: LucideIcons.creditCard,
-                title: "Payment History",
-                routeName: '/paymentHistory'),
-            const _ProfileItem(
-                icon: LucideIcons.wallet,
-                title: "Wallet",
-                routeName: '/wallet'),
-            const _ProfileItem(
-                icon: LucideIcons.shieldCheck,
-                title: "Security",
-                routeName: '/security'),
-            const _ProfileItem(
-                icon: LucideIcons.settings,
-                title: "Settings",
-                routeName: '/settings'),
-          ],
-        ),
+          final user = snapshot.data!;
+          return SingleChildScrollView(
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            child: Column(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 14, 113, 128),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          const CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.person_outline,
+                                color: Colors.teal, size: 30),
+                          ),
+                          const SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(user.name,
+                                  style: const TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              Text(user.email,
+                                  style: const TextStyle(
+                                      color: Colors.white, fontSize: 14)),
+                              Row(
+                                children: [
+                                  const Icon(Icons.location_on,
+                                      color: Colors.white, size: 14),
+                                  const SizedBox(width: 4),
+                                  Text(user.location,
+                                      style: const TextStyle(
+                                          color: Colors.white, fontSize: 12)),
+                                ],
+                              ),
+                            ],
+                          )
+                        ],
+                      ),
+                      const Divider(height: 24, color: Colors.transparent),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: const [
+                          _ProfileStat(count: "0", label: "Tasks"),
+                          VerticalDivider(color: Colors.white70, thickness: 1),
+                          _ProfileStat(count: "★ 0.0", label: "Rating"),
+                          VerticalDivider(color: Colors.white70, thickness: 1),
+                          _ProfileStat(count: "₹0", label: "Earned"),
+                        ],
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: 16),
+                const _ProfileItem(
+                    icon: LucideIcons.checkSquare,
+                    title: "Create tasks",
+                    routeName: '/tp_yourtasks'),
+                const _ProfileItem(
+                    icon: LucideIcons.messageCircle,
+                    title: "Messages",
+                    routeName: '/tp_messages'),
+                const _ProfileItem(
+                    icon: LucideIcons.creditCard,
+                    title: "Payment History",
+                    routeName: '/paymentHistory'),
+                const _ProfileItem(
+                    icon: LucideIcons.wallet,
+                    title: "Wallet",
+                    routeName: '/wallet'),
+                const _ProfileItem(
+                    icon: LucideIcons.shieldCheck,
+                    title: "Security",
+                    routeName: '/security'),
+                const _ProfileItem(
+                    icon: LucideIcons.settings,
+                    title: "Settings",
+                    routeName: '/settings'),
+              ],
+            ),
+          );
+        },
       ),
     );
   }

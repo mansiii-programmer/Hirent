@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 import 'package:hirent2/screens/sharedpref.dart';
 
 class SettingsPage extends StatefulWidget {
@@ -13,13 +15,16 @@ class _SettingsPageState extends State<SettingsPage> {
   bool darkMode = false;
   bool twoFactorAuth = false;
 
+  TextEditingController emailController = TextEditingController();
+  TextEditingController otpController = TextEditingController();
+  TextEditingController newPasswordController = TextEditingController();
+
   @override
   void initState() {
     super.initState();
-    _loadNotificationPreference(); // ✅ Load saved notification preference
+    _loadNotificationPreference();
   }
 
-  // ✅ Load notifications state from shared preferences
   Future<void> _loadNotificationPreference() async {
     final saved = await SharedPrefService.getBool('notifications');
     if (saved != null) {
@@ -27,10 +32,125 @@ class _SettingsPageState extends State<SettingsPage> {
     }
   }
 
-  // ✅ Save notifications state to shared preferences
   Future<void> _updateNotificationPreference(bool value) async {
     setState(() => notifications = value);
     await SharedPrefService.setBool('notifications', value);
+  }
+
+  Future<void> sendOtp(String email) async {
+    final response = await http.post(
+      Uri.parse('http://127.0.0.1:8000/otp/otp/send'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({'email': email}),
+    );
+
+    final data = jsonDecode(response.body);
+    if (response.statusCode != 200) {
+      throw Exception("Failed to send OTP: ${data['message']}");
+    }
+  }
+
+  Future<void> changePassword(
+      String email, String otp, String newPassword) async {
+    final response = await http.post(
+      Uri.parse(
+          'http://127.0.0.1:8000/changepassword/changepassword/reset-password'),
+      headers: {'Content-Type': 'application/json'},
+      body: jsonEncode({
+        'email': email,
+        'otp': otp,
+        'new_password': newPassword,
+      }),
+    );
+    print(email);
+    print(otp);
+    print(newPassword);
+
+    final data = jsonDecode(response.body);
+    print(data);
+
+    if (response.statusCode != 200) {
+      throw Exception("Password change failed: ${data['message']}");
+    }
+  }
+
+  void showEmailDialog(BuildContext context) {
+    showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Enter your Email"),
+        content: TextField(
+          controller: emailController,
+          decoration: const InputDecoration(hintText: "example@gmail.com"),
+        ),
+        actions: [
+          TextButton(
+            child: const Text("Send OTP"),
+            onPressed: () async {
+              final email = emailController.text.trim();
+              try {
+                await sendOtp(email);
+                Navigator.of(context, rootNavigator: true)
+                    .pop(); // Close email dialog
+                await showOtpDialog(context, email); // Now open OTP dialog
+              } catch (e) {
+                Navigator.of(context, rootNavigator: true).pop();
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Error: ${e.toString()}")),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
+  }
+
+  Future<void> showOtpDialog(BuildContext context, String email) async {
+    otpController.clear();
+    newPasswordController.clear();
+
+    await showDialog(
+      context: context,
+      builder: (_) => AlertDialog(
+        title: const Text("Verify OTP"),
+        content: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            TextField(
+              controller: otpController,
+              decoration: const InputDecoration(hintText: "Enter OTP"),
+            ),
+            TextField(
+              controller: newPasswordController,
+              decoration: const InputDecoration(hintText: "New Password"),
+              obscureText: true,
+            ),
+          ],
+        ),
+        actions: [
+          TextButton(
+            child: const Text("Change Password"),
+            onPressed: () async {
+              final otp = otpController.text.trim();
+              final newPassword = newPasswordController.text.trim();
+              Navigator.of(context, rootNavigator: true).pop();
+              try {
+                await changePassword(email, otp, newPassword);
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                      content: Text("Password changed successfully")),
+                );
+              } catch (e) {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  SnackBar(content: Text("Error: ${e.toString()}")),
+                );
+              }
+            },
+          ),
+        ],
+      ),
+    );
   }
 
   @override
@@ -48,7 +168,7 @@ class _SettingsPageState extends State<SettingsPage> {
             icon: Icons.notifications_none,
             label: 'Notifications',
             value: notifications,
-            onChanged: (val) => _updateNotificationPreference(val), // ✅
+            onChanged: (val) => _updateNotificationPreference(val),
           ),
           settingsTileSwitch(
             icon: Icons.nightlight_round,
@@ -69,7 +189,7 @@ class _SettingsPageState extends State<SettingsPage> {
             leading: const Icon(Icons.vpn_key),
             title: const Text('Change Password'),
             trailing: const Icon(Icons.arrow_forward_ios, size: 16),
-            onTap: () {},
+            onTap: () => showEmailDialog(context),
           ),
           settingsTileSwitch(
             icon: Icons.lock_outline,

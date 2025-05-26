@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/sharedpref.dart';
 import 'package:http/http.dart' as http;
 
 class TsHomePage extends StatefulWidget {
@@ -34,16 +35,18 @@ class _TsHomePageState extends State<TsHomePage> {
   }
 
   Future<void> acceptTask(String taskId) async {
-    final url = Uri.parse('http://127.0.0.1:8000/accept/$taskId');
+    final url = Uri.parse('http://127.0.0.1:8000/tasks/accept/$taskId');
+    final String? userId = await SharedPrefService.getUserId();
+
     try {
       final response = await http.put(
         url,
         headers: {'Content-Type': 'application/json'},
-        body: jsonEncode({'assigned_to': widget.seekerId}),
+        body: jsonEncode({'assigned_to': userId}),
       );
-
       if (response.statusCode == 200 &&
-          jsonDecode(response.body)['message'] == 'Task accepted successfully') {
+          jsonDecode(response.body)['message'] ==
+              'Task accepted successfully') {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(content: Text('Task accepted successfully')),
         );
@@ -187,8 +190,8 @@ class _TsHomePageState extends State<TsHomePage> {
                               fit: BoxFit.cover,
                               errorBuilder: (_, __, ___) => const SizedBox(
                                 height: 200,
-                                child:
-                                    Center(child: Icon(Icons.image_not_supported)),
+                                child: Center(
+                                    child: Icon(Icons.image_not_supported)),
                               ),
                             ),
                           ),
