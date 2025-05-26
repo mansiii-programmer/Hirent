@@ -81,7 +81,8 @@ def accept_task(task_id: str, assigned_to: str = Body(..., embed=True)):
         {"_id": obj_id, "assigned_to": None},
         {"$set": {"assigned_to": assigned_to}}
     )
-
+    print ("result",result)
+    
     if result.modified_count == 1:
         # Use assigned_to as a string directly
         users_collection.update_one(

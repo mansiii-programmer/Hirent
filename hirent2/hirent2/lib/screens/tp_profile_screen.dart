@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'edit_profile.dart';
 
 class TPProfileSettingsPage extends StatelessWidget {
   const TPProfileSettingsPage({super.key});
@@ -19,16 +20,15 @@ class TPProfileSettingsPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 14, 113, 128),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
+            Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 14, 113, 128),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: const Row(
                     children: [
                       CircleAvatar(
                         radius: 28,
@@ -62,23 +62,35 @@ class TPProfileSettingsPage extends StatelessWidget {
                       )
                     ],
                   ),
-                  const Divider(height: 24, color: Colors.transparent),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      _ProfileStat(count: "0", label: "Tasks"),
-                      VerticalDivider(color: Colors.white70, thickness: 1),
-                      _ProfileStat(count: "★ 0.0", label: "Rating"),
-                      VerticalDivider(color: Colors.white70, thickness: 1),
-                      _ProfileStat(count: "₹0", label: "Earned"),
-                    ],
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const EditProfileScreen()),
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
+            ),
+            const Divider(height: 24, color: Colors.transparent),
+            Row(
+              mainAxisAlignment: MainAxisAlignment.spaceAround,
+              children: const [
+                _ProfileStat(count: "0", label: "Tasks"),
+                VerticalDivider(color: Colors.white70, thickness: 1),
+                _ProfileStat(count: "★ 0.0", label: "Rating"),
+                VerticalDivider(color: Colors.white70, thickness: 1),
+                _ProfileStat(count: "₹0", label: "Earned"),
+              ],
             ),
             const SizedBox(height: 16),
-
-            // List of Profile Items with Routes
             const _ProfileItem(
                 icon: LucideIcons.checkSquare,
                 title: "Create tasks",

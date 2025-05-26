@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:lucide_icons/lucide_icons.dart';
+import 'edit_profile.dart';
 
 class TSProfileSettingsPage extends StatelessWidget {
   const TSProfileSettingsPage({super.key});
@@ -19,66 +20,86 @@ class TSProfileSettingsPage extends StatelessWidget {
         padding: const EdgeInsets.symmetric(horizontal: 16),
         child: Column(
           children: [
-            Container(
-              decoration: BoxDecoration(
-                color: const Color.fromARGB(255, 14, 113, 128),
-                borderRadius: BorderRadius.circular(12),
-              ),
-              padding: const EdgeInsets.all(16),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  const Row(
+            Stack(
+              children: [
+                Container(
+                  decoration: BoxDecoration(
+                    color: const Color.fromARGB(255, 14, 113, 128),
+                    borderRadius: BorderRadius.circular(12),
+                  ),
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      CircleAvatar(
-                        radius: 28,
-                        backgroundColor: Colors.white,
-                        child: Icon(Icons.person_outline,
-                            color: Colors.teal, size: 30),
-                      ),
-                      SizedBox(width: 12),
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
+                      const Row(
                         children: [
-                          Text("Mansiiii",
-                              style: TextStyle(
-                                  color: Colors.white,
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold)),
-                          Text("mansi.awasthi222@gmail.com",
-                              style:
-                                  TextStyle(color: Colors.white, fontSize: 14)),
-                          Row(
-                            children: [
-                              Icon(Icons.location_on,
-                                  color: Colors.white, size: 14),
-                              SizedBox(width: 4),
-                              Text("Mumbai, Maharashtra",
-                                  style: TextStyle(
-                                      color: Colors.white, fontSize: 12)),
-                            ],
+                          CircleAvatar(
+                            radius: 28,
+                            backgroundColor: Colors.white,
+                            child: Icon(Icons.person_outline,
+                                color: Colors.teal, size: 30),
                           ),
+                          SizedBox(width: 12),
+                          Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text("Mansiiii",
+                                  style: TextStyle(
+                                      color: Colors.white,
+                                      fontSize: 18,
+                                      fontWeight: FontWeight.bold)),
+                              Text("mansi.awasthi222@gmail.com",
+                                  style: TextStyle(
+                                      color: Colors.white, fontSize: 14)),
+                              Row(
+                                children: [
+                                  Icon(Icons.location_on,
+                                      color: Colors.white, size: 14),
+                                  SizedBox(width: 4),
+                                  Text("Mumbai, Maharashtra",
+                                      style: TextStyle(
+                                          color: Colors.white, fontSize: 12)),
+                                ],
+                              ),
+                            ],
+                          )
                         ],
-                      )
+                      ),
+                      const Divider(height: 24, color: Colors.transparent),
+                      Row(
+                        mainAxisAlignment: MainAxisAlignment.spaceAround,
+                        children: const [
+                          _ProfileStat(count: "0", label: "Tasks"),
+                          VerticalDivider(
+                              color: Colors.white70, thickness: 1),
+                          _ProfileStat(count: "★ 0.0", label: "Rating"),
+                          VerticalDivider(
+                              color: Colors.white70, thickness: 1),
+                          _ProfileStat(count: "₹0", label: "Earned"),
+                        ],
+                      ),
                     ],
                   ),
-                  const Divider(height: 24, color: Colors.transparent),
-                  Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceAround,
-                    children: const [
-                      _ProfileStat(count: "0", label: "Tasks"),
-                      VerticalDivider(color: Colors.white70, thickness: 1),
-                      _ProfileStat(count: "★ 0.0", label: "Rating"),
-                      VerticalDivider(color: Colors.white70, thickness: 1),
-                      _ProfileStat(count: "₹0", label: "Earned"),
-                    ],
+                ),
+                Positioned(
+                  top: 8,
+                  right: 8,
+                  child: IconButton(
+                    icon: const Icon(Icons.edit, color: Colors.white),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (context) => const EditProfileScreen()),
+                      );
+                    },
                   ),
-                ],
-              ),
+                ),
+              ],
             ),
             const SizedBox(height: 16),
 
-            // List of Profile Items with Routes
+            // Profile Items
             const _ProfileItem(
                 icon: LucideIcons.checkSquare,
                 title: "Your Tasks",
