@@ -1,11 +1,19 @@
 import 'dart:convert';
-
 import 'package:shared_preferences/shared_preferences.dart';
 
 class SharedPrefService {
   static SharedPreferences? _prefs;
+
   static Future<void> init() async {
     _prefs = await SharedPreferences.getInstance();
+  }
+
+  static Future<void> saveUserId(String userId) async {
+    await _prefs?.setString('user_id', userId);
+  }
+
+  static Future<String?> getUserId() async {
+    return _prefs?.getString('user_id');
   }
 
   static Future<void> setString(String key, String value) async {

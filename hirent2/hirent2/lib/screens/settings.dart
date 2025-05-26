@@ -14,6 +14,26 @@ class _SettingsPageState extends State<SettingsPage> {
   bool twoFactorAuth = false;
 
   @override
+  void initState() {
+    super.initState();
+    _loadNotificationPreference(); // ✅ Load saved notification preference
+  }
+
+  // ✅ Load notifications state from shared preferences
+  Future<void> _loadNotificationPreference() async {
+    final saved = await SharedPrefService.getBool('notifications');
+    if (saved != null) {
+      setState(() => notifications = saved);
+    }
+  }
+
+  // ✅ Save notifications state to shared preferences
+  Future<void> _updateNotificationPreference(bool value) async {
+    setState(() => notifications = value);
+    await SharedPrefService.setBool('notifications', value);
+  }
+
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
@@ -28,7 +48,7 @@ class _SettingsPageState extends State<SettingsPage> {
             icon: Icons.notifications_none,
             label: 'Notifications',
             value: notifications,
-            onChanged: (val) => setState(() => notifications = val),
+            onChanged: (val) => _updateNotificationPreference(val), // ✅
           ),
           settingsTileSwitch(
             icon: Icons.nightlight_round,
@@ -77,8 +97,6 @@ class _SettingsPageState extends State<SettingsPage> {
             onTap: () {},
           ),
           const SizedBox(height: 30),
-
-          // 🚀 LOGOUT BUTTON
           ElevatedButton.icon(
             icon: const Icon(Icons.logout),
             label: const Text('Logout'),
@@ -92,12 +110,10 @@ class _SettingsPageState extends State<SettingsPage> {
             ),
             onPressed: () async {
               await SharedPrefService.remove('auth_token');
-              // Replace current page with the login page
               Navigator.pushNamedAndRemoveUntil(
                   context, '/signin', (route) => false);
             },
           ),
-
           const SizedBox(height: 30),
           Center(
             child: Text(

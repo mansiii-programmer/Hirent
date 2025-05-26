@@ -1,8 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/sharedpref.dart';
 import 'package:hirent2/screens/ts_homescreen.dart';
 import 'package:http/http.dart' as http;
 import 'dart:convert';
-
 import 'tp_homepage.dart';
 import 'ts_homescreen.dart';
 
@@ -79,6 +79,11 @@ class _SignInPageState extends State<SignInPage> {
           );
           return;
         }
+        final userId = user['_id']; // <-- add this line
+        print(user);
+
+        await SharedPrefService.saveUserId(userId.toString());
+        print('User ID saved locally: $userId');
 
         // Navigate based on role
         if (backendRole == 'seeker') {
