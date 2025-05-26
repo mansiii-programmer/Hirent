@@ -2,8 +2,12 @@ from fastapi import APIRouter, HTTPException
 from pydantic import BaseModel
 from typing import Optional
 from database.connection import tasks_collection
-from fastapi import Body
 from bson import ObjectId
+from fastapi import APIRouter, HTTPException, Query, Body
+from database.connection import users_collection, tasks_collection
+from bson import ObjectId
+from bson.errors import InvalidId
+
 
 router = APIRouter()
 
@@ -64,6 +68,7 @@ def search_tasks(q: str):
         tasks.append(task)
     return tasks
 
+# ---------------- Accept Task ---------------- #
 @router.put("/accept/{task_id}")
 def accept_task(task_id: str, assigned_to: str = Body(..., embed=True)):
     """Assign a task to a seeker (accept the task)."""
@@ -73,10 +78,16 @@ def accept_task(task_id: str, assigned_to: str = Body(..., embed=True)):
         return {"error": "Invalid task ID format"}
 
     result = tasks_collection.update_one(
-        {"_id": obj_id, "assigned_to": ""},
+        {"_id": obj_id, "assigned_to": None},
         {"$set": {"assigned_to": assigned_to}}
     )
+
     if result.modified_count == 1:
+        # Use assigned_to as a string directly
+        users_collection.update_one(
+            {"_id": assigned_to},
+            {"$push": {"tasks_assigned": str(obj_id)}}
+        )
         return {"message": "Task accepted successfully"}
     return {"error": "Task not found or already assigned"}
 @router.get("/tasks/category")

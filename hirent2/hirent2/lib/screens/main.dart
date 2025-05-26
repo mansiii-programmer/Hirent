@@ -54,7 +54,7 @@ class HirentApp extends StatelessWidget {
             return MaterialPageRoute(
                 builder: (_) => const SignUpScreen(selectedRole: ''));
           case '/seekerMain':
-            return MaterialPageRoute(builder: (_) => TsHomePage());
+            return MaterialPageRoute(builder: (_) => TsHomePage(seekerId: '68225f34d92bb78dd1e27274',));
           case '/providerMain':
             return MaterialPageRoute(builder: (_) => TpHomeScreen());
           case '/ts_profile':
@@ -76,7 +76,7 @@ class HirentApp extends StatelessWidget {
           case '/settings':
             return MaterialPageRoute(builder: (_) => SettingsPage());
           case '/wallet':
-            return MaterialPageRoute(builder: (_) => WalletPage());
+            return MaterialPageRoute(builder: (_) => WalletPage(userId: '',));
           case '/security':
             return MaterialPageRoute(builder: (_) => SecurityPage());
           case '/paymentHistory':

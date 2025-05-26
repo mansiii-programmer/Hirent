@@ -1,19 +1,70 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class WalletPage extends StatefulWidget {
-  const WalletPage({super.key});
+  final String userId; // pass userId when navigating to this screen
+
+  const WalletPage({super.key, required this.userId});
 
   @override
   _WalletPageState createState() => _WalletPageState();
 }
 
 class _WalletPageState extends State<WalletPage> {
-  int walletBalance = 1500;
+  int walletBalance = 0;
+  final String baseUrl = 'http://127.0.0.1:8000'; // change to your backend url
+
+  @override
+  void initState() {
+    super.initState();
+    fetchWalletBalance();
+  }
+
+  Future<void> fetchWalletBalance() async {
+    final url = Uri.parse('$baseUrl/users/${widget.userId}/wallet');
+
+    try {
+      final response = await http.get(url);
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          walletBalance = data['wallet'];
+        });
+      } else {
+        print('failed to fetch wallet: ${response.body}');
+      }
+    } catch (e) {
+      print('error: $e');
+    }
+  }
+
+  Future<void> updateWalletOnServer(int newAmount) async {
+    final url = Uri.parse('$baseUrl/users/${widget.userId}/wallet');
+    try {
+      final response = await http.put(
+        url,
+        headers: {'Content-Type': 'application/json'},
+        body: json.encode({'wallet': newAmount}),
+      );
+      if (response.statusCode == 200) {
+        print('wallet updated');
+      } else {
+        print('failed to update wallet: ${response.body}');
+      }
+    } catch (e) {
+      print('error: $e');
+    }
+  }
 
   void addMoney(int amount) {
+    final newAmount = walletBalance + amount;
     setState(() {
-      walletBalance += amount;
+      walletBalance = newAmount;
     });
+
+    updateWalletOnServer(newAmount); // update backend
+
     showDialog(
       context: context,
       builder: (context) => Align(
@@ -59,7 +110,6 @@ class _WalletPageState extends State<WalletPage> {
       body: ListView(
         padding: const EdgeInsets.all(16),
         children: [
-          // wallet balance card
           Container(
             padding: const EdgeInsets.all(20),
             decoration: BoxDecoration(
@@ -80,12 +130,9 @@ class _WalletPageState extends State<WalletPage> {
               ],
             ),
           ),
-
           const SizedBox(height: 16),
-
-          // add money button
           ElevatedButton.icon(
-            onPressed: () => addMoney(6000), // simulate adding money
+            onPressed: () => addMoney(6000),
             icon: Icon(Icons.add),
             label: Text('Add Money to Wallet'),
             style: ElevatedButton.styleFrom(
@@ -95,13 +142,9 @@ class _WalletPageState extends State<WalletPage> {
               shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
             ),
           ),
-
           const SizedBox(height: 24),
-
-          // quick actions
           Text('Quick Actions', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
           const SizedBox(height: 12),
-
           actionTile('Manage Payment Methods'),
           const SizedBox(height: 6),
           actionTile('Transaction History'),
@@ -121,7 +164,7 @@ class _WalletPageState extends State<WalletPage> {
         title: Text(label),
         trailing: Icon(Icons.arrow_forward_ios_rounded, size: 16),
         onTap: () {
-          // navigate to respective screen
+          // implement your navigation
         },
       ),
     );
