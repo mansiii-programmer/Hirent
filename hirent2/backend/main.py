@@ -27,7 +27,7 @@ origins = [
 # Enable CORS
 app.add_middleware(
     CORSMiddleware,
-   allow_origins=["*"],  # In production, restrict this to frontend domain
+    allow_origins=["*"],  # In production, restrict this to frontend domain
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -40,4 +40,5 @@ app.include_router(otp_router, prefix="/otp")
 app.include_router(task_router, prefix="/tasks", tags=["Tasks"])
 app.include_router(user_router, prefix="/users", tags=["Users"])
 app.include_router(sbert_router, tags=["Recommendation"])
+app.include_router(changepassword_router, prefix="/changepassword", tags=["Password Reset"]) 
 
