@@ -88,9 +88,24 @@ class HirentApp extends StatelessWidget {
           case '/paymentHistory':
             return MaterialPageRoute(builder: (_) => PaymentHistoryPage());
           case '/ts_messages':
-            return MaterialPageRoute(builder: (_) => ChatScreen());
+            final args = settings.arguments as Map<String, dynamic>?;
+
+            final currentUser =
+                args != null ? args['currentUser'] as String : '';
+
+            return MaterialPageRoute(
+              builder: (_) => TsChatScreen(currentUser: currentUser),
+            );
+
           case '/tp_messages':
-            return MaterialPageRoute(builder: (_) => ChatPage());
+            final args = settings.arguments as Map<String, dynamic>?;
+
+            final currentUser =
+                args != null ? args['currentUser'] as String : '';
+
+            return MaterialPageRoute(
+              builder: (_) => TsChatScreen(currentUser: currentUser),
+            );
           case '/createTask':
             return MaterialPageRoute(
                 builder: (_) => CreateTaskScreen(

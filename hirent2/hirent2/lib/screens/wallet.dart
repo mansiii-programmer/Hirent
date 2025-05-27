@@ -22,7 +22,7 @@ class _WalletPageState extends State<WalletPage> {
   }
 
   Future<void> fetchWalletBalance() async {
-    final url = Uri.parse('$baseUrl/users/${widget.userId}/wallet');
+    final url = Uri.parse('$baseUrl/users/users/68225f34d92bb78dd1e2726e/wallet');
 
     try {
       final response = await http.get(url);

@@ -114,11 +114,11 @@ class TaskSeekerProfile extends StatelessWidget {
                     Wrap(
                       spacing: 8,
                       children: const [
-                        Chip(label: Text("Cleaning"), backgroundColor: Colors.blue),
-                        Chip(label: Text("Gardening"), backgroundColor: Colors.green),
-                        Chip(label: Text("Pet Care"), backgroundColor: Colors.purple),
-                        Chip(label: Text("Delivery"), backgroundColor: Colors.orange),
-                        Chip(label: Text("Assembly"), backgroundColor: Colors.black54),
+                        Chip(label: Text("Cleaning"),labelStyle: TextStyle(color: Colors.white), backgroundColor: Color.fromARGB(255, 37, 36, 36)),
+                        Chip(label: Text("Gardening"),labelStyle: TextStyle(color: Colors.white), backgroundColor: Color.fromARGB(255, 37, 36, 36)),
+                        Chip(label: Text("Pet Care"),labelStyle: TextStyle(color: Colors.white), backgroundColor: Color.fromARGB(255, 37, 36, 36)),
+                        Chip(label: Text("Delivery"),labelStyle: TextStyle(color: Colors.white), backgroundColor: Color.fromARGB(255, 37, 36, 36)),
+                        Chip(label: Text("Assembly"),labelStyle: TextStyle(color: Colors.white), backgroundColor: Color.fromARGB(255, 37, 36, 36)),
                       ],
                     ),
                   ],

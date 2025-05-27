@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/sharedpref.dart';
 import 'package:hirent2/screens/task_seeker_profile.dart'; // adjust the path as per your project structure
 
 class TpHomeScreen extends StatefulWidget {
@@ -11,7 +12,8 @@ class TpHomeScreen extends StatefulWidget {
 class _TpHomeScreenState extends State<TpHomeScreen> {
   int _currentIndex = 0;
 
-  void _onTabTapped(int index) {
+  void _onTabTapped(int index) async {
+    final String? userId = await SharedPrefService.getUserId();
     if (index == 1) {
       Navigator.pushNamed(context, '/tp_yourtasks').then((_) {
         setState(() {
@@ -19,11 +21,11 @@ class _TpHomeScreenState extends State<TpHomeScreen> {
         });
       });
     } else if (index == 2) {
-      Navigator.pushNamed(context, '/tp_messages').then((_) {
-        setState(() {
-          _currentIndex = 0;
-        });
-      });
+      Navigator.pushNamed(
+        context,
+        '/tp_messages',
+        arguments: {'currentUser': userId},
+      );
     } else if (index == 3) {
       Navigator.pushNamed(context, '/tp_profile').then((_) {
         setState(() {

@@ -66,11 +66,16 @@ class _TsHomePageState extends State<TsHomePage> {
     }
   }
 
-  void _onTabTapped(int index) {
+  void _onTabTapped(int index) async {
+    final String? userId = await SharedPrefService.getUserId();
     if (index == 1) {
       Navigator.pushNamed(context, '/ts_yourtasks');
     } else if (index == 2) {
-      Navigator.pushNamed(context, '/ts_messages');
+      Navigator.pushNamed(
+        context,
+        '/ts_messages',
+        arguments: {'currentUser': userId},
+      );
     } else if (index == 3) {
       Navigator.pushNamed(context, '/ts_profile');
     }
