@@ -53,6 +53,8 @@ def login(user: UserLogin):
         "token_type": "bearer",
         "user": {
             "email": db_user["email"],
-            "role": db_user["role"]
+            "role": db_user["role"],
+            "_id": str(db_user["_id"]),
+            "username": db_user["username"]
         }
     }

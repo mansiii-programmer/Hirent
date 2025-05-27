@@ -91,6 +91,15 @@ def accept_task(task_id: str, assigned_to: str = Body(..., embed=True)):
         )
         return {"message": "Task accepted successfully"}
     return {"error": "Task not found or already assigned"}
-@router.get("/tasks/category")
-def get_tasks_by_category(cat: str):
-    return {"category": cat}
+@router.get("/assigned/{user_id}")
+def get_assigned_tasks(user_id: str):
+    """Get all tasks assigned to a specific user."""
+    tasks = []
+    for task in tasks_collection.find({"assigned_to": user_id}):
+        task["_id"] = str(task["_id"])
+        tasks.append(task)
+
+    if not tasks:
+        raise HTTPException(status_code=404, detail="No tasks assigned to this user.")
+
+    return {"assigned_tasks": tasks}
