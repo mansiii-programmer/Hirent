@@ -23,7 +23,7 @@ class _ChatScreenState extends State<TpChatScreen> {
   }
 
   Future<void> fetchAllMessages() async {
-    final url = Uri.parse('http://127.0.0.1:8000/chat/chat/history/all/${widget.currentUser}');
+    final url = Uri.parse('http://127.0.0.1:8000/chat/chat/partners/${widget.currentUser}');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {

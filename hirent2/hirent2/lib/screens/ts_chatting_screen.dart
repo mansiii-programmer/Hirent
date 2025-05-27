@@ -23,13 +23,14 @@ class _TsChatScreenState extends State<TsChatScreen> {
   }
 
   Future<void> fetchAllMessages() async {
-    final url = Uri.parse('http://127.0.0.1:8000/chat/chat/history/all/${widget.currentUser}');
+    final url = Uri.parse('http://127.0.0.1:8000/chat/chat/partners/${widget.currentUser}');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
-      final List<dynamic> data = jsonDecode(response.body);
+      print(response.body);
+      final data = jsonDecode(response.body);
       setState(() {
-        allMessages = data;
+        allMessages = data['partners'];
         isLoading = false;
       });
     } else {

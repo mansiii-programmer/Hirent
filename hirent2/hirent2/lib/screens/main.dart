@@ -98,10 +98,14 @@ class HirentApp extends StatelessWidget {
             );
 
           case '/tp_messages':
+            final args = settings.arguments as Map<String, dynamic>?;
+
+            final currentUser =
+                args != null ? args['currentUser'] as String : '';
+
             return MaterialPageRoute(
-                builder: (_) => TpChatScreen(
-                      currentUser: '',
-                    ));
+              builder: (_) => TsChatScreen(currentUser: currentUser),
+            );
           case '/createTask':
             return MaterialPageRoute(builder: (_) => CreateTaskScreen());
           default:
