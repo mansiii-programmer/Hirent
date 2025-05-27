@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:shared_preferences/shared_preferences.dart';
+import 'dart:convert';
+
 import 'package:hirent2/screens/create_task.dart';
 
 class MyTasksScreen extends StatefulWidget {
@@ -12,6 +16,7 @@ class _MyTasksScreenState extends State<MyTasksScreen>
     with SingleTickerProviderStateMixin {
   String selectedFilter = 'All';
   late TabController _tabController;
+  List<dynamic> _tasks = [];
 
   @override
   void initState() {
@@ -28,6 +33,34 @@ class _MyTasksScreenState extends State<MyTasksScreen>
         });
       }
     });
+    _loadTasks(); // Load tasks when screen initializes
+  }
+
+  Future<void> _loadTasks() async {
+    final prefs = await SharedPreferences.getInstance();
+    final userId = prefs.getString('userId');
+    if (userId != null) {
+      await _fetchTasks(userId);
+    } else {
+      print('User ID not found in SharedPreferences');
+    }
+  }
+
+  Future<void> _fetchTasks(String userId) async {
+    try {
+      final response =
+          await http.get(Uri.parse('http://YOUR_API_URL/tasks/user/$userId'));
+      if (response.statusCode == 200) {
+        final data = json.decode(response.body);
+        setState(() {
+          _tasks = data['tasks'];
+        });
+      } else {
+        print('Failed to load tasks');
+      }
+    } catch (e) {
+      print('Error: $e');
+    }
   }
 
   @override
@@ -46,7 +79,7 @@ class _MyTasksScreenState extends State<MyTasksScreen>
         leading: IconButton(
           icon: const Icon(Icons.arrow_back, color: Colors.black),
           onPressed: () {
-            Navigator.pop(context); // Navigate back to previous screen
+            Navigator.pop(context);
           },
         ),
         title: const Text(
@@ -57,12 +90,13 @@ class _MyTasksScreenState extends State<MyTasksScreen>
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: ElevatedButton.icon(
-              onPressed: () {
-                Navigator.push(
+              onPressed: () async {
+                await Navigator.push(
                   context,
                   MaterialPageRoute(
                       builder: (context) => const CreateTaskScreen()),
                 );
+                _loadTasks(); // Refresh tasks after returning from CreateTaskScreen
               },
               icon: const Icon(Icons.add, color: Colors.white),
               label: const Text("Create Task"),
@@ -126,32 +160,19 @@ class _MyTasksScreenState extends State<MyTasksScreen>
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
       child: Column(
-        children: [
-          buildTaskCard(
-            category: "Cleaning",
-            title: "Cleaning Task",
-            desc:
-                "This is a cleaning task that needs to be done. The task involves helping with cleaning services.",
-            location: "San Francisco, CA",
-            timeAgo: "1 day ago",
-            price: "₹50",
-            imageUrl:
-                "https://images.pexels.com/photos/4107285/pexels-photo-4107285.jpeg",
-            color: Colors.blue, 
-          ),
-          buildTaskCard(
-            category: "Babysitting",
-            title: "Babysitting Task",
-            desc:
-                "This is a babysitting task that needs to be done. The task involves helping with babysitting services.",
-            location: "Los Angeles, CA",
-            timeAgo: "2 days ago",
-            price: "₹70",
-            imageUrl:
-                "https://images.pexels.com/photos/3662667/pexels-photo-3662667.jpeg",
-            color: Colors.pink,
-          ),
-        ],
+        children: _tasks.map((task) {
+          return buildTaskCard(
+            category: task['category'] ?? 'Unknown',
+            title: task['title'] ?? 'No Title',
+            desc: task['description'] ?? '',
+            location: task['location'] ?? 'Unknown',
+            timeAgo: task['created_at'] ?? 'Just now',
+            price: '₹${task['price'] ?? '0'}',
+            imageUrl: task['image_url'] ??
+                'https://via.placeholder.com/400x200.png?text=No+Image',
+            color: Colors.blue,
+          );
+        }).toList(),
       ),
     );
   }
@@ -198,11 +219,7 @@ class _MyTasksScreenState extends State<MyTasksScreen>
                     : Container(
                         height: 160,
                         width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: Colors.grey[300],
-                          borderRadius: const BorderRadius.vertical(
-                              top: Radius.circular(10)),
-                        ),
+                        color: Colors.grey[300],
                         child: const Icon(
                           Icons.image_not_supported,
                           size: 60,

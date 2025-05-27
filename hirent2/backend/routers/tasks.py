@@ -7,6 +7,9 @@ from fastapi import APIRouter, HTTPException, Query, Body
 from database.connection import users_collection, tasks_collection
 from bson import ObjectId
 from bson.errors import InvalidId
+from datetime import datetime
+from fastapi import APIRouter, HTTPException
+
 
 
 router = APIRouter()
@@ -102,3 +105,23 @@ def get_assigned_tasks(user_id: str):
         raise HTTPException(status_code=404, detail="No tasks assigned to this user.")
 
     return {"assigned_tasks": tasks}
+
+@router.get("/posted/{user_id}")
+def get_posted_tasks(user_id: str):
+    """
+    Get all tasks posted by a specific provider.
+    """
+    user = users_collection.find_one({"_id": ObjectId(user_id)})
+
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found.")
+
+    if user.get("role") != "provider":
+        raise HTTPException(status_code=403, detail="User is not a provider.")
+
+    tasks_posted = user.get("tasks_posted", [])
+    
+    if not tasks_posted:
+        raise HTTPException(status_code=404, detail="No tasks posted by this provider.")
+
+    return {"posted_tasks": tasks_posted}
