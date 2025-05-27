@@ -1,132 +1,253 @@
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class ChatScreen extends StatelessWidget {
-  const ChatScreen({super.key});
+// main screen for ts chatting
+class TsChatScreen extends StatefulWidget {
+  final String currentUser;
 
-  final List<Map<String, dynamic>> chatList = const [
-    {
-      'name': 'Provider 1',
-      'message': 'Let\'s discuss about the cleaning task',
-      'time': 'about 16 hours ago',
-      'unreadCount': 1,
-    },
-    {
-      'name': 'Provider 2',
-      'message': 'Let\'s discuss about the babysitting task',
-      'time': 'about 14 hours ago',
-      'unreadCount': 2,
-    },
-    {
-      'name': 'Provider 3',
-      'message': 'Let\'s discuss about the gardening task',
-      'time': 'about 11 hours ago',
-      'unreadCount': 1,
-    },
-    {
-      'name': 'Provider 4',
-      'message': 'Let\'s discuss about the cooking task',
-      'time': 'about 16 hours ago',
-      'unreadCount': 2,
-    },
-    {
-      'name': 'Provider 5',
-      'message': 'Let\'s discuss about the pet care task',
-      'time': 'about 10 hours ago',
-      'unreadCount': 0,
-    },
-  ];
+  const TsChatScreen({super.key, required this.currentUser});
+
+  @override
+  State<TsChatScreen> createState() => _TsChatScreenState();
+}
+
+class _TsChatScreenState extends State<TsChatScreen> {
+  List<dynamic> allMessages = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchAllMessages();
+  }
+
+  Future<void> fetchAllMessages() async {
+    final url = Uri.parse('http://127.0.0.1:8000/chat/chat/history/all/${widget.currentUser}');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        allMessages = data;
+        isLoading = false;
+      });
+    } else {
+      print("Failed to fetch chat list: ${response.statusCode}");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  String getTimeAgo(String isoTime) {
+    final time = DateTime.parse(isoTime);
+    final now = DateTime.now();
+    final diff = now.difference(time);
+    if (diff.inHours >= 1) {
+      return 'about ${diff.inHours} hour${diff.inHours > 1 ? 's' : ''} ago';
+    } else if (diff.inMinutes >= 1) {
+      return 'about ${diff.inMinutes} minute${diff.inMinutes > 1 ? 's' : ''} ago';
+    }
+    return 'just now';
+  }
 
   @override
   Widget build(BuildContext context) {
+    final Map<String, Map<String, dynamic>> chatSummaries = {};
+
+    for (var msg in allMessages) {
+      final otherUser = msg['sender'] == widget.currentUser ? msg['receiver'] : msg['sender'];
+
+      if (!chatSummaries.containsKey(otherUser)) {
+        chatSummaries[otherUser] = {
+          'name': otherUser,
+          'message': msg['message'],
+          'timestamp': msg['timestamp'],
+          'unread': 0,
+        };
+      }
+
+      if (msg['receiver'] == widget.currentUser && msg['is_read'] == false) {
+        chatSummaries[otherUser]!['unread'] += 1;
+      }
+    }
+
+    final chatList = chatSummaries.values.toList()
+      ..sort((a, b) => DateTime.parse(b['timestamp']).compareTo(DateTime.parse(a['timestamp'])));
+
     return Scaffold(
-      backgroundColor: const Color(0xFFFAFAF6),
-      body: Column(
-        children: [
-          Padding(
-            padding: const EdgeInsets.fromLTRB(16, 8, 16, 8),
-            child: TextField(
-              decoration: InputDecoration(
-                hintText: 'Search messages...',
-                hintStyle: const TextStyle(color: Colors.grey),
-                prefixIcon: const Icon(Icons.search, color: Colors.grey),
-                filled: true,
-                fillColor: const Color(0xFFF1F3F2),
-                contentPadding: const EdgeInsets.all(12),
-                border: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(12),
-                  borderSide: BorderSide.none,
-                ),
-              ),
-            ),
-          ),
-          Expanded(
-            child: ListView.builder(
-              itemCount: chatList.length,
-              itemBuilder: (context, index) {
-                final chat = chatList[index];
-                return InkWell(
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (_) => ChatDetailScreen(name: chat['name']),
-                      ),
-                    );
-                  },
-                  child: Container(
-                    margin:
-                        const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    padding: const EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(12),
-                    ),
-                    child: Row(
-                      children: [
-                        CircleAvatar(
-                          backgroundColor: Colors.grey[200],
-                          child: Text(chat['name'].substring(0, 1),
-                              style:
-                                  const TextStyle(fontWeight: FontWeight.bold)),
-                        ),
-                        const SizedBox(width: 12),
-                        Expanded(
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Text(chat['name'],
-                                  style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 16)),
-                              const SizedBox(height: 4),
-                              Text(chat['message'],
-                                  style:
-                                      const TextStyle(color: Colors.black87)),
-                            ],
+      appBar: AppBar(
+        title: const Text(
+          'Messages',
+          style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      backgroundColor: const Color(0xFFFAFAF8),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : chatList.isEmpty
+              ? const Center(child: Text("No conversations found"))
+              : ListView.separated(
+                  itemCount: chatList.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
+                  itemBuilder: (context, index) {
+                    final chat = chatList[index];
+                    return Container(
+                      color: index % 2 == 0 ? Colors.white : const Color(0xFFF7FAFB),
+                      child: ListTile(
+                        leading: CircleAvatar(
+                          backgroundColor: const Color(0xFFEDF1F3),
+                          child: Text(
+                            chat['name'][0].toUpperCase(),
+                            style: const TextStyle(color: Colors.black),
                           ),
                         ),
-                        Column(
-                          crossAxisAlignment: CrossAxisAlignment.end,
+                        title: Text(
+                          chat['name'],
+                          style: const TextStyle(fontWeight: FontWeight.bold),
+                        ),
+                        subtitle: Text(chat['message']),
+                        trailing: Column(
+                          mainAxisAlignment: MainAxisAlignment.center,
                           children: [
-                            Text(chat['time'],
-                                style: const TextStyle(
-                                    fontSize: 12, color: Colors.grey)),
-                            if (chat['unreadCount'] > 0)
+                            Text(
+                              getTimeAgo(chat['timestamp']),
+                              style: const TextStyle(fontSize: 12, color: Colors.grey),
+                            ),
+                            if (chat['unread'] > 0)
                               Container(
-                                margin: const EdgeInsets.only(top: 6),
-                                padding: const EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
+                                margin: const EdgeInsets.only(top: 4),
+                                padding: const EdgeInsets.all(6),
+                                decoration: const BoxDecoration(
                                   color: Colors.purple,
-                                  borderRadius: BorderRadius.circular(20),
+                                  shape: BoxShape.circle,
                                 ),
                                 child: Text(
-                                  chat['unreadCount'].toString(),
-                                  style: const TextStyle(
-                                      color: Colors.white, fontSize: 12),
+                                  chat['unread'].toString(),
+                                  style: const TextStyle(color: Colors.white, fontSize: 12),
                                 ),
                               ),
                           ],
+                        ),
+                        onTap: () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) => TsChatPage(
+                                user1: widget.currentUser,
+                                user2: chat['name'],
+                              ),
+                            ),
+                          );
+                        },
+                      ),
+                    );
+                  },
+                ),
+    );
+  }
+}
+
+// chat page screen for ts chatting
+class TsChatPage extends StatefulWidget {
+  final String user1;
+  final String user2;
+
+  const TsChatPage({super.key, required this.user1, required this.user2});
+
+  @override
+  State<TsChatPage> createState() => _TsChatPageState();
+}
+
+class _TsChatPageState extends State<TsChatPage> {
+  List<dynamic> messages = [];
+  bool isLoading = true;
+
+  @override
+  void initState() {
+    super.initState();
+    fetchChatHistory();
+  }
+
+  Future<void> fetchChatHistory() async {
+    final url = Uri.parse('http://127.0.0.1:8000/chat/chat/history/${widget.user1}/${widget.user2}');
+    final response = await http.get(url);
+
+    if (response.statusCode == 200) {
+      final List<dynamic> data = jsonDecode(response.body);
+      setState(() {
+        messages = data;
+        isLoading = false;
+      });
+    } else {
+      print("Failed to fetch messages: ${response.statusCode}");
+      setState(() {
+        isLoading = false;
+      });
+    }
+  }
+
+  String getTimeAgo(String isoTime) {
+    final time = DateTime.parse(isoTime);
+    final now = DateTime.now();
+    final diff = now.difference(time);
+    if (diff.inHours >= 1) {
+      return 'about ${diff.inHours} hour${diff.inHours > 1 ? 's' : ''} ago';
+    } else if (diff.inMinutes >= 1) {
+      return 'about ${diff.inMinutes} minute${diff.inMinutes > 1 ? 's' : ''} ago';
+    }
+    return 'just now';
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    // messages are already the chat between user1 and user2
+    // so just show them as a list with some UI
+    
+    return Scaffold(
+      backgroundColor: const Color(0xFFFAFAF8),
+      appBar: AppBar(
+        title: Text(
+          widget.user2,
+          style: const TextStyle(color: Colors.black, fontWeight: FontWeight.bold),
+        ),
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+      ),
+      body: isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : ListView.separated(
+              padding: const EdgeInsets.all(8),
+              itemCount: messages.length,
+              separatorBuilder: (context, index) => const SizedBox(height: 8),
+              itemBuilder: (context, index) {
+                final msg = messages[index];
+                final isMe = msg['sender'] == widget.user1;
+                return Align(
+                  alignment: isMe ? Alignment.centerRight : Alignment.centerLeft,
+                  child: Container(
+                    padding: const EdgeInsets.all(12),
+                    decoration: BoxDecoration(
+                      color: isMe ? Colors.purple : Colors.grey.shade300,
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                    child: Column(
+                      crossAxisAlignment: isMe ? CrossAxisAlignment.end : CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          msg['message'],
+                          style: TextStyle(color: isMe ? Colors.white : Colors.black),
+                        ),
+                        const SizedBox(height: 4),
+                        Text(
+                          getTimeAgo(msg['timestamp']),
+                          style: TextStyle(
+                            color: isMe ? Colors.white70 : Colors.black54,
+                            fontSize: 10,
+                          ),
                         ),
                       ],
                     ),
@@ -134,146 +255,6 @@ class ChatScreen extends StatelessWidget {
                 );
               },
             ),
-          ),
-        ],
-      ),
-    );
-  }
-}
-
-// --- Chat Detail Screen ---
-
-// Inside same file with ChatScreen
-
-class ChatDetailScreen extends StatelessWidget {
-  final String name;
-
-  const ChatDetailScreen({super.key, required this.name});
-
-  final List<Map<String, dynamic>> messages = const [
-    {
-      'from': 'P',
-      'message': 'Yes, I can help with cooking. When would you need it?',
-      'time': 'about 11 hours ago',
-    },
-    {
-      'from': 'Y',
-      'message': 'Hi, I\'m interested in pet care services. Are you available?',
-      'time': 'about 3 hours ago',
-    },
-    {
-      'from': 'P',
-      'message': 'Yes, I can help with tutoring. When would you need it?',
-      'time': 'about 4 hours ago',
-    },
-    {
-      'from': 'Y',
-      'message': 'Hi, I\'m interested in shopping services. Are you available?',
-      'time': 'about 17 hours ago',
-    },
-  ];
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: const Color(0xFFFAFAF6),
-      appBar: AppBar(
-        backgroundColor: const Color(0xFFFAFAF6),
-        elevation: 0,
-        iconTheme: const IconThemeData(color: Colors.black),
-        title: Text(name,
-            style: const TextStyle(
-                fontWeight: FontWeight.bold, color: Colors.black)),
-      ),
-      body: Column(
-        children: [
-          const SizedBox(height: 40), // optional spacing to replace AppBar
-          Expanded(
-            child: ListView.builder(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              itemCount: messages.length,
-              itemBuilder: (context, index) {
-                final msg = messages[index];
-                final isSender = msg['from'] == 'Y';
-                return Column(
-                  crossAxisAlignment: isSender
-                      ? CrossAxisAlignment.end
-                      : CrossAxisAlignment.start,
-                  children: [
-                    Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 14, vertical: 10),
-                      margin: const EdgeInsets.symmetric(vertical: 4),
-                      decoration: BoxDecoration(
-                        color: isSender
-                            ? const Color(0xFFF3F3F1) // lighter shade
-                            : const Color(0xFFEFEFEA), // slightly darker
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Text(
-                        msg['message'],
-                        style: const TextStyle(color: Colors.black87),
-                      ),
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(bottom: 8),
-                      child: Text(
-                        msg['time'],
-                        style:
-                            const TextStyle(fontSize: 12, color: Colors.grey),
-                      ),
-                    ),
-                  ],
-                );
-              },
-            ),
-          ),
-          const ChatInputFieldStyled(),
-        ],
-      ),
-    );
-  }
-}
-
-class ChatInputFieldStyled extends StatelessWidget {
-  const ChatInputFieldStyled({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return Container(
-      color: const Color(0xFFFAFAF6),
-      padding: const EdgeInsets.fromLTRB(12, 10, 12, 20),
-      child: Row(
-        children: [
-          Expanded(
-            child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16),
-              decoration: BoxDecoration(
-                color: const Color(0xFFF1F3F2),
-                borderRadius: BorderRadius.circular(24),
-              ),
-              child: const TextField(
-                decoration: InputDecoration(
-                  border: InputBorder.none,
-                  hintText: 'Type a message...',
-                  hintStyle: TextStyle(color: Colors.grey),
-                ),
-              ),
-            ),
-          ),
-          const SizedBox(width: 8),
-          Container(
-            decoration: const BoxDecoration(
-              shape: BoxShape.circle,
-              color: Color(0xFFF1F3F2),
-            ),
-            child: IconButton(
-              icon: const Icon(Icons.send, color: Colors.grey),
-              onPressed: () {},
-            ),
-          ),
-        ],
-      ),
     );
   }
 }

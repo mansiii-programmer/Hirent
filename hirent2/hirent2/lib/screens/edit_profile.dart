@@ -1,4 +1,7 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/sharedpref.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
@@ -20,6 +23,39 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
   List<String> interests = ['Photography', 'Cooking', 'Travel'];
   String selectedRole = 'Task Provider';
 
+  Future<void> updateUserProfile() async {
+    final String? userId = await SharedPrefService.getUserId();
+    final url = Uri.parse('http://127.0.0.1:8000/users/users/$userId'); // replace with your backend URL
+
+    final Map<String, dynamic> userData = {
+      "username": usernameController.text.trim(),
+      "phone": phoneController.text.trim(),
+      "bio": bioController.text.trim(),
+    };
+
+    try {
+      final response = await http.put(
+        url,
+        headers: {"Content-Type": "application/json"},
+        body: jsonEncode(userData),
+      );
+
+      if (response.statusCode == 200) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text("Profile updated successfully!")),
+        );
+      } else {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text("Error: ${response.reasonPhrase}")),
+        );
+      }
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Failed to update profile: $e")),
+      );
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -28,7 +64,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
         title: const Text('Edit Profile'),
         actions: [
           TextButton(
-            onPressed: () {},
+            onPressed: () {
+              updateUserProfile();
+            },
             child: const Text('Save Changes', style: TextStyle(color: Colors.teal)),
           ),
         ],
@@ -143,7 +181,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
               child: TextField(
                 controller: chipController,
                 decoration: InputDecoration(
-                  hintText: 'Add $label'.toLowerCase(),
+                  hintText: 'Add ${label.toLowerCase()}',
                   border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                 ),
               ),

@@ -70,7 +70,11 @@ class _TsHomePageState extends State<TsHomePage> {
     if (index == 1) {
       Navigator.pushNamed(context, '/ts_yourtasks');
     } else if (index == 2) {
-      Navigator.pushNamed(context, '/ts_messages');
+      Navigator.pushNamed(
+        context,
+        '/ts_messages',
+        arguments: {'currentUser': 'your_current_username_here'},
+      );
     } else if (index == 3) {
       Navigator.pushNamed(context, '/ts_profile');
     }
