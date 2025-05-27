@@ -31,19 +31,40 @@ TASK_CATEGORIES = [
 def get_categories():
     """Return predefined task categories for frontend dropdown."""
     return {"categories": TASK_CATEGORIES}
-
 # ---------------- Create Task ---------------- #
+from datetime import datetime
+from bson import ObjectId
+
 @router.post("/")
 def create_task(task: Task):
     """Create a new task (for posting from mobile)."""
     if not task.posted_by:
-        task.posted_by = "test-user-id"  # Optional fallback
+        task.posted_by = "test-user-id"
+
     result = tasks_collection.insert_one(task.dict())
+
+    # Create a flat task object (as shown in MongoDB screenshot)
+    posted_task_info = {
+        "title": task.title,
+        "description": task.description,
+        "category": task.category,
+        "location": task.location,
+        "created_at": datetime.utcnow().isoformat()
+    }
+
+    # Ensure posted_by is ObjectId if stored that way
+    user_id = ObjectId(task.posted_by) if ObjectId.is_valid(task.posted_by) else task.posted_by
+
+    # Push to the user's tasks_posted array directly
+    users_collection.update_one(
+        {"_id": user_id},
+        {"$push": {"tasks_posted": posted_task_info}}
+    )
+
     return {
         "message": "Task created successfully",
         "task_id": str(result.inserted_id)
     }
-
 # ---------------- List All Tasks ---------------- #
 @router.get("/")
 def list_tasks():
