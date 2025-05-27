@@ -45,6 +45,8 @@ def create_task(task: Task):
         task.posted_by = "test-user-id"
 
     result = tasks_collection.insert_one(task.dict())
+    print(result)
+    
 
     # Create a flat task object (as shown in MongoDB screenshot)
     posted_task_info = {

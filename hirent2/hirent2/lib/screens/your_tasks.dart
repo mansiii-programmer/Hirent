@@ -1,7 +1,39 @@
 import 'package:flutter/material.dart';
+import 'package:hirent2/screens/sharedpref.dart';
+import 'package:http/http.dart' as http;
+import 'dart:convert';
 
-class YourTasksPage extends StatelessWidget {
+class YourTasksPage extends StatefulWidget {
   const YourTasksPage({super.key});
+
+  @override
+  State<YourTasksPage> createState() => _YourTasksPageState();
+}
+
+class _YourTasksPageState extends State<YourTasksPage> {
+  List acceptedTasks = [];
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchAcceptedTasks();
+  }
+
+  Future<void> _fetchAcceptedTasks() async {
+    final String? userId = await SharedPrefService.getUserId();
+    final response = await http
+        .get(Uri.parse('http://127.0.0.1:8000/tasks/assigned/$userId'));
+
+    if (response.statusCode == 200) {
+      final taskList = jsonDecode(response.body);
+      setState(() {
+        acceptedTasks = taskList["assigned_tasks"];
+      });
+    } else {
+      // Handle error
+      print('Failed to load tasks: ${response.statusCode}');
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -11,7 +43,6 @@ class YourTasksPage extends StatelessWidget {
         backgroundColor: const Color(0xFFF9F9F6),
         body: Column(
           children: [
-            // Header and Tabs
             Container(
               padding: const EdgeInsets.fromLTRB(16, 40, 16, 10),
               color: Colors.white,
@@ -36,14 +67,12 @@ class YourTasksPage extends StatelessWidget {
                         indicator: BoxDecoration(
                           border: Border(
                             bottom: BorderSide(
-                              color: Color(
-                                  0xFF2684FC), // Match soft blue from the screenshot
+                              color: Color(0xFF2684FC),
                               width: 3.0,
                             ),
                           ),
                         ),
-                        labelColor:
-                            Color(0xFF2684FC), // Match blue icon + text color
+                        labelColor: Color(0xFF2684FC),
                         unselectedLabelColor: Colors.brown.shade400,
                         tabs: const [
                           Tab(icon: Icon(Icons.inventory), text: 'All'),
@@ -56,14 +85,12 @@ class YourTasksPage extends StatelessWidget {
                 ],
               ),
             ),
-
-            // Tab Views
             Expanded(
               child: TabBarView(
                 children: [
                   taskListView(),
-                  taskListView(), // Placeholder duplicate for Open
-                  taskListView(), // Placeholder duplicate for Completed
+                  taskListView(), // Can be filtered later
+                  taskListView(), // Can be filtered later
                 ],
               ),
             ),
@@ -77,32 +104,17 @@ class YourTasksPage extends StatelessWidget {
     return SingleChildScrollView(
       padding: const EdgeInsets.all(12),
       child: Column(
-        children: [
-          buildTaskCard(
-            category: "Cleaning",
-            title: "Cleaning Task",
-            desc:
-                "This is a cleaning task that needs to be done. The task involves helping with cleaning services.",
-            location: "San Francisco, CA",
-            timeAgo: "1 day ago",
-            price: "₹16",
-            imageUrl:
-                "https://images.pexels.com/photos/4107285/pexels-photo-4107285.jpeg",
-            color: Colors.blue,
-          ),
-          buildTaskCard(
-            category: "Babysitting",
-            title: "Babysitting Task",
-            desc:
-                "This is a babysitting task that needs to be done. The task involves helping with babysitting services.",
-            location: "New York, NY",
-            timeAgo: "4 days ago",
-            price: "₹50",
-            imageUrl:
-                "https://images.pexels.com/photos/3662667/pexels-photo-3662667.jpeg", // to test fallback
-            color: Colors.pink,
-          ),
-        ],
+        children: acceptedTasks.map((task) {
+          return buildTaskCard(
+            category: task['category'] ?? "",
+            title: task['title'] ?? "",
+            desc: task['description'] ?? "",
+            location: task['location'] ?? "",
+            price: task['price'] ?? "",
+            imageUrl: "",
+            color: Colors.grey,
+          );
+        }).toList(),
       ),
     );
   }
@@ -112,7 +124,6 @@ class YourTasksPage extends StatelessWidget {
     required String title,
     required String desc,
     required String location,
-    required String timeAgo,
     required String price,
     required String imageUrl,
     required Color color,
@@ -124,7 +135,6 @@ class YourTasksPage extends StatelessWidget {
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          // Image with fallback and category badge
           Stack(
             children: [
               ClipRRect(
@@ -173,15 +183,13 @@ class YourTasksPage extends StatelessWidget {
                     borderRadius: BorderRadius.circular(12),
                   ),
                   child: Text(
-                    timeAgo,
+                    "30m",
                     style: const TextStyle(color: Colors.white, fontSize: 12),
                   ),
                 ),
               ),
             ],
           ),
-
-          // Task info
           Padding(
             padding: const EdgeInsets.all(12),
             child: Column(

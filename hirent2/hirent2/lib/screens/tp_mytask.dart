@@ -25,10 +25,11 @@ class _MyTasksScreenState extends State<MyTasksScreen>
     _tabController.addListener(() {
       if (_tabController.indexIsChanging) {
         setState(() {
-          if (_tabController.index == 0)
+          if (_tabController.index == 0) {
             selectedFilter = 'All';
-          else if (_tabController.index == 1)
+          } else if (_tabController.index == 1)
             selectedFilter = 'Open';
+          // ignore: curly_braces_in_flow_control_structures
           else if (_tabController.index == 2) selectedFilter = 'Completed';
         });
       }
@@ -38,7 +39,7 @@ class _MyTasksScreenState extends State<MyTasksScreen>
 
   Future<void> _loadTasks() async {
     final prefs = await SharedPreferences.getInstance();
-    final userId = prefs.getString('userId');
+    final userId = prefs.getString('user_id');
     if (userId != null) {
       await _fetchTasks(userId);
     } else {
@@ -48,12 +49,13 @@ class _MyTasksScreenState extends State<MyTasksScreen>
 
   Future<void> _fetchTasks(String userId) async {
     try {
-      final response =
-          await http.get(Uri.parse('http://YOUR_API_URL/tasks/user/$userId'));
+      final response = await http
+          .get(Uri.parse('http://127.0.0.1:8000/tasks/posted/$userId'));
+
       if (response.statusCode == 200) {
         final data = json.decode(response.body);
         setState(() {
-          _tasks = data['tasks'];
+          _tasks = data['posted_tasks'];
         });
       } else {
         print('Failed to load tasks');
@@ -94,7 +96,9 @@ class _MyTasksScreenState extends State<MyTasksScreen>
                 await Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) => const CreateTaskScreen()),
+                      builder: (context) => const CreateTaskScreen(
+                            currentUserId: '',
+                          )),
                 );
                 _loadTasks(); // Refresh tasks after returning from CreateTaskScreen
               },
@@ -168,8 +172,7 @@ class _MyTasksScreenState extends State<MyTasksScreen>
             location: task['location'] ?? 'Unknown',
             timeAgo: task['created_at'] ?? 'Just now',
             price: '₹${task['price'] ?? '0'}',
-            imageUrl: task['image_url'] ??
-                'https://via.placeholder.com/400x200.png?text=No+Image',
+            imageUrl: task['image_url'] ?? '',
             color: Colors.blue,
           );
         }).toList(),
